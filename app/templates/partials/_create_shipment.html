@@ -1,75 +1,74 @@
-<!---Requires CreateShipment in forms.py--->>
-<section id="create-shipment-form" class="form">
-  <strong><u>Add a Shipment</u></strong>
-  <form action="POST">
-    {{ form.hidden_tag() }}
+<!---Requires CreateShipment in forms.py--->
+  <section id="create-shipment-form" class="form">
+    <strong><u>Add a Shipment</u></strong>
+    <form action="POST">
+      {{ form.hidden_tag() }}
 
-    <!-- Identifier -->
-    <div class="form-group">
-      {{ form.registration_number.label }}
-      {{ form.registration_number }}
-    </div>
+      <!-- Identifier -->
+      <div class="form-group">
+        {{ form.registration_number.label }}
+        {{ form.registration_number }}
+      </div>
 
-    <!-- Shipper -->
-    <div class="form-group">
-      {{ form.first_name.label }}
-      {{ form.first_name }}
-    </div>
+      <!-- Shipper -->
+      <div class="form-group">
+        {{ form.first_name.label }}
+        {{ form.first_name }}
+      </div>
 
-    <div class="form-group">
-      {{ form.last_name.label }}
-      {{ form.last_name }}
-    </div>
+      <div class="form-group">
+        {{ form.last_name.label }}
+        {{ form.last_name }}
+      </div>
 
-    <!-- Routing -->
-    <div class="form-group">
-      {{ form.origin.label }}
-      {{ form.origin }}
-    </div>
-    <div class="form-group">
-      {{ form.destination.label }}
-      {{ form.destination }}
-    </div>
+      <!-- Routing -->
+      <div class="form-group">
+        {{ form.origin.label }}
+        {{ form.origin }}
+      </div>
+      <div class="form-group">
+        {{ form.destination.label }}
+        {{ form.destination }}
+      </div>
 
-    <!-- Tagging -->
-    <div class="form-group">
-      {{ form.tag_colour.label }}
-      {{ form.tag_colour }}
-    </div>
-    <div class="form-group">
-      {{ form.tag_code.label }}
-      {{ form.tag_code }}
-    </div>
+      <!-- Tagging -->
+      <div class="form-group">
+        {{ form.tag_colour.label }}
+        {{ form.tag_colour }}
+      </div>
+      <div class="form-group">
+        {{ form.tag_code.label }}
+        {{ form.tag_code }}
+      </div>
 
-    <!-- Dates -->
-    <div class="form-group">
-      {{ form.date_received.label }}
-      {{ form.date_received }}
-    </div>
-    <div class="form-group">
-      {{ form.date_out.label }}
-      {{ form.date_out }}
-    </div>
+      <!-- Dates -->
+      <div class="form-group">
+        {{ form.date_received.label }}
+        {{ form.date_received }}
+      </div>
+      <div class="form-group">
+        {{ form.date_out.label }}
+        {{ form.date_out }}
+      </div>
 
-    <!-- Drivers -->>
-    <div class="form-group">
-      {{ form.driver_in.label }}
-      {{ form.driver_in }}
-    </div>
-    <div class="form-group">
-      {{ form.driver_out.label }}
-      {{ form.driver_out }}
-    </div>
+      <!-- Drivers -->
+      <div class="form-group">
+        {{ form.driver_in.label }}
+        {{ form.driver_in }}
+      </div>
+      <div class="form-group">
+        {{ form.driver_out.label }}
+        {{ form.driver_out }}
+      </div>
 
-    <!-- Checking -->
-    <div class="form-group">
-      {{ form.checked_in_by.label }}
-      {{ form.checked_in_by }}
-    </div>
-    <div class="form-group">
-      {{ form.checked_out_by.label }}
-      {{ form.checked_out_by }}
-    </div>
-
-  </form>
-</section>
+      <!-- Checking -->
+      <div class="form-group">
+        {{ form.checked_in_by.label }}
+        {{ form.checked_in_by }}
+      </div>
+      <div class="form-group">
+        {{ form.checked_out_by.label }}
+        {{ form.checked_out_by }}
+      </div>
+    </form>
+  </section>

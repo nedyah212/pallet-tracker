@@ -5,4 +5,4 @@ class HelperMethods():
 
   @staticmethod
   def remove_delimiters(text):
-    return text.replace('-', '').replace(' ', '').replace('/', '')
+    return text.replace('-', '').replace(' ', '').replace('/', '') if text is not None else ''
