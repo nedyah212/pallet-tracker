@@ -2,7 +2,7 @@ import pytest
 import os
 import tempfile
 import sys
-from app.forms import CreateShipmentForm
+from app.forms import Forms
 from app.services import HelperMethods
 
 # Add parent directory to path
@@ -17,9 +17,9 @@ def app():
     test_app = create_app()
 
     db_fd, db_path = tempfile.mkstemp()
-    test_app.config["SQLALCHEMY_DATABASE_URI"] = f"sqlite:///{db_path}"
+    test_app.config["SQLALCHEMY_DATABASE_URI"] = os.getenv('DATABASE')
     test_app.config["TESTING"] = True
-    test_app.config["WTF_CSRF_ENABLED"] = False  # Disable CSRF for testing
+    test_app.config["WTF_CSRF_ENABLED"] = False
 
     with test_app.app_context():
         db.create_all()
@@ -27,7 +27,6 @@ def app():
         db.session.remove()
         db.drop_all()
 
-    # Cleanup
     os.close(db_fd)
     os.unlink(db_path)
 
@@ -55,6 +54,7 @@ class TestHelperMethods:
         helper = HelperMethods()
         assert helper.boolean_to_status_string(True) == "At Capacity"
         assert helper.boolean_to_status_string(False) == "Not at Capacity"
+        assert helper.boolean_to_status_string(None) == ""
 
     def test_remove_delimiters(self):
         """Test remove delimiters for functionality"""
@@ -64,13 +64,14 @@ class TestHelperMethods:
         assert helper.remove_delimiters("8136 0025 2025") == "813600252025"
         assert helper.remove_delimiters("8136   0025-2025") == "813600252025"
         assert helper.remove_delimiters("8136/0025/2025") == "813600252025"
+        assert helper.remove_delimiters(None) == ""
 
 class TestCreateShipmentForm:
     """Test create shipment form for functionality"""
     def test_form_valid(self, app):
         """Test form validation with valid data."""
         with app.app_context():
-            form = CreateShipmentForm(data={
+            form = Forms.CreateShipmentForm(data={
                 'registration_number': '8150-0939-2934',
                 'first_name': 'John',
                 'last_name': 'Doe',
@@ -90,7 +91,7 @@ class TestCreateShipmentForm:
     def test_form_invalid(self, app):
         """Test form validation with invalid data"""
         with app.app_context():
-            form = CreateShipmentForm(data={
+            form = Forms.CreateShipmentForm(data={
                 'registration_number': '',
                 'first_name': 'John',
                 'last_name': 'Doe',
@@ -110,7 +111,7 @@ class TestCreateShipmentForm:
     def test_form_requirements(self, app):
         """Test Non PK Field That Is Required"""
         with app.app_context():
-            form = CreateShipmentForm(data={
+            form = Forms.CreateShipmentForm(data={
                 'registration_number': '',
                 'first_name': 'John',
                 'last_name': 'Doe',
@@ -130,7 +131,7 @@ class TestCreateShipmentForm:
     def test_form_optional_field(self, app):
         """Test Non PK Field That Is Optional"""
         with app.app_context():
-            form = CreateShipmentForm(data={
+            form = Forms.CreateShipmentForm(data={
                 'registration_number': '',
                 'first_name': 'John',
                 'last_name': 'Doe',
