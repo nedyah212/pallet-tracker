@@ -1,15 +1,17 @@
+from datetime import datetime
 from .logging import logger
-
 from flask_wtf import FlaskForm
 from wtforms import StringField, SubmitField, BooleanField, DateTimeField
-from wtforms.validators import DataRequired, Length, Optional
-from wtforms_sqlalchemy.fields import QuerySelectField
+from wtforms.validators import DataRequired, Length, Optional, ValidationError
+from .models import Shipment
+from .services import HelperMethods
 
 class CreateShipmentForm(FlaskForm):
 
     registration_number = StringField(
         "Registration Number",
         validators=[DataRequired(), Length(min=1, max=50)],
+        filters=[HelperMethods.remove_delimiters]
     )
     first_name = StringField(
         "First Name",
@@ -21,16 +23,17 @@ class CreateShipmentForm(FlaskForm):
     )
     tag_colour = StringField(
         "Tag Colour",
-        validators=[Optional(), Length(max=15)],
+        validators=[DataRequired(), Length(min=3, max=15)],
     )
     tag_code = StringField(
         "Tag Code",
-        validators=[Optional(), Length(max=30)],
+        validators=[DataRequired(), Length(min=6, max=30)],
     )
     date_received = DateTimeField(
         "Date Received",
         format="%Y-%m-%d %H:%M:%S",
-        validators=[Optional()],
+        validators=[DataRequired()],
+        default=datetime.now
     )
     date_out = DateTimeField(
         "Date Out",
@@ -49,10 +52,6 @@ class CreateShipmentForm(FlaskForm):
         "Driver In",
         validators=[Optional(), Length(max=30)],
     )
-    driver_out = StringField(
-        "Driver Out",
-        validators=[Optional(), Length(max=30)],
-    )
     checked_in_by = StringField(
         "Checked In By",
         validators=[Optional(), Length(max=30)],
@@ -61,6 +60,19 @@ class CreateShipmentForm(FlaskForm):
         "Checked Out By",
         validators=[Optional(), Length(max=30)],
     )
+    driver_out = StringField(
+        "Driver Out",
+        validators=[Optional(), Length(max=30)],
+    )
 
     archived = BooleanField("Archived", default=False)
+
     submit = SubmitField("Save Shipment")
+
+    def validate_registration_number(self, registration_number):
+        shipment = Shipment.query.filter_by(registration_number=registration_number).first()
+        if shipment:
+            logger.warning(
+                f"ConstraintViolation: {registration_number} allready exists in the database"
+            )
+            raise ValidationError("The registration number must be unique.")

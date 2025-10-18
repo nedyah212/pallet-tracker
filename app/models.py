@@ -97,7 +97,7 @@ class OversizedGood(StorageObject, db.Model):
     return self.location
 
   def get_status(self):
-    return f"Being stored in {self.get_location()}"
+    return f"Stored in {self.get_location()}"
 
   def get_owners(self):
     return [self.registration_number]
