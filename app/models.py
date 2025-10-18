@@ -53,6 +53,7 @@ class Pallet(StorageObject, db.Model):
 
   shipment = db.relationship('Shipment', back_populates='pallets')
 
+  #interface methods
   def get_location(self):
     return f"Row {self.row}"
 
@@ -71,6 +72,7 @@ class Trailer(StorageObject, db.Model):
 
   shipments = db.relationship('Shipment', back_populates='trailer', cascade='all, delete-orphan')
 
+  #interface methods
   def get_location(self):
     return self.location
 
@@ -90,6 +92,7 @@ class OversizedGood(StorageObject, db.Model):
 
   shipment = db.relationship('Shipment', back_populates='non_palletized_goods')
 
+  #interface methods
   def get_location(self):
     return self.location
 
