@@ -42,7 +42,7 @@ class CreateShipmentForm(FlaskForm):
     )
     origin = StringField(
         "Origin",
-        validators=[Optional(), Length(max=30)],
+        validators=[DataRequired(), Length(max=30)],
     )
     destination = StringField(
         "Destination",
@@ -70,7 +70,7 @@ class CreateShipmentForm(FlaskForm):
     submit = SubmitField("Save Shipment")
 
     def validate_registration_number(self, registration_number):
-        shipment = Shipment.query.filter_by(registration_number=registration_number).first()
+        shipment = Shipment.query.filter_by(registration_number=registration_number.data).first()
         if shipment:
             logger.warning(
                 f"ConstraintViolation: {registration_number} allready exists in the database"

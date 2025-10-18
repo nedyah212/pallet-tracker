@@ -1,7 +1,6 @@
 from app import db
-from abc import ABC, abstractmethod
 from sqlalchemy.ext.hybrid import hybrid_property
-from services import HelperMethods
+from .services import HelperMethods
 
 class Shipment(db.Model):
   __tablename__ = "shipments"
@@ -20,6 +19,7 @@ class Shipment(db.Model):
   checked_in_by = db.Column(db.String(30), nullable=True)
   checked_out_by = db.Column(db.String(30), nullable=True)
   archived = db.Column(db.Boolean, default=False)
+  trailer_id = db.Column(db.String(15), db.ForeignKey('trailers.id'), nullable=True)
 
   trailer = db.relationship('Trailer', back_populates='shipments')
   pallets = db.relationship('Pallet', back_populates='shipment', passive_deletes=True)
@@ -29,21 +29,7 @@ class Shipment(db.Model):
   def shipper_name_reversed(self):
     return self.last_name + ', ' + self.first_name
 
-class StorageObject(ABC):
-
-  @abstractmethod
-  def get_location(self):
-    pass
-
-  @abstractmethod
-  def get_status(self):
-    pass
-
-  @abstractmethod
-  def get_owners(self):
-    pass
-
-class Pallet(StorageObject, db.Model):
+class Pallet(db.Model):
   __tablename__ = "pallets"
 
   id = db.Column(db.String(5), primary_key=True)
@@ -53,17 +39,7 @@ class Pallet(StorageObject, db.Model):
 
   shipment = db.relationship('Shipment', back_populates='pallets')
 
-  #interface methods
-  def get_location(self):
-    return f"Row {self.row}"
-
-  def get_status(self):
-    return HelperMethods.boolean_to_status_string(self.status)
-
-  def get_owners(self):
-    return [self.registration_number] if self.registration_number else []
-
-class Trailer(StorageObject, db.Model):
+class Trailer(db.Model):
   __tablename__ = "trailers"
 
   id = db.Column(db.String(15), primary_key=True)
@@ -72,17 +48,7 @@ class Trailer(StorageObject, db.Model):
 
   shipments = db.relationship('Shipment', back_populates='trailer', cascade='all, delete-orphan')
 
-  #interface methods
-  def get_location(self):
-    return self.location
-
-  def get_status(self):
-    return HelperMethods.boolean_to_status_string(self.status)
-
-  def get_owners(self):
-    return [s.registration_number for s in self.shipments if not s.archived]
-
-class OversizedGood(StorageObject, db.Model):
+class OversizedGood(db.Model):
   __tablename__ = "oversized_goods"
 
   id = db.Column(db.Integer, primary_key=True, autoincrement=True)
@@ -91,13 +57,3 @@ class OversizedGood(StorageObject, db.Model):
   registration_number = db.Column(db.String(50), db.ForeignKey('shipments.registration_number'), nullable=True)
 
   shipment = db.relationship('Shipment', back_populates='non_palletized_goods')
-
-  #interface methods
-  def get_location(self):
-    return self.location
-
-  def get_status(self):
-    return f"Stored in {self.get_location()}"
-
-  def get_owners(self):
-    return [self.registration_number]
