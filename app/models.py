@@ -6,19 +6,19 @@ from services import HelperMethods
 class Shipment(db.Model):
   __tablename__ = "shipments"
 
-  registration_number = db.Column(db.String, primary_key=True)
+  registration_number = db.Column(db.String(50), primary_key=True)
   first_name = db.Column(db.String(30), nullable=False)
   last_name = db.Column(db.String(30), nullable=False)
-  tag_colour = db.Column(db.String, nullable=True)
-  tag_code = db.Column(db.String, nullable=True)
+  tag_colour = db.Column(db.String(15), nullable=True)
+  tag_code = db.Column(db.String(30), nullable=True)
   date_received = db.Column(db.DateTime, nullable=True)
   date_out = db.Column(db.DateTime, nullable=True)
-  origin = db.Column(db.String, nullable=True)
-  destination = db.Column(db.String, nullable=True)
-  driver_in = db.Column(db.String, nullable=True)
-  driver_out = db.Column(db.String, nullable=True)
-  checked_in_by = db.Column(db.String, nullable=True)
-  checked_out_by = db.Column(db.String, nullable=True)
+  origin = db.Column(db.String(30), nullable=True)
+  destination = db.Column(db.String(30), nullable=True)
+  driver_in = db.Column(db.String(30), nullable=True)
+  driver_out = db.Column(db.String(30), nullable=True)
+  checked_in_by = db.Column(db.String(30), nullable=True)
+  checked_out_by = db.Column(db.String(30), nullable=True)
   archived = db.Column(db.Boolean, default=False)
 
   trailer = db.relationship('Trailer', back_populates='shipments')
