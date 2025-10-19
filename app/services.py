@@ -17,7 +17,8 @@ class Services():
   class DatabaseMethods():
 
     def create_shipment(form_data):
-      shipment = Shipment(**form_data)
+      filtered_data = {k: v for k, v in form_data.items() if k != 'submit'}
+      shipment = Shipment(**filtered_data)
       try:
           db.session.add(shipment)
           db.session.commit()
