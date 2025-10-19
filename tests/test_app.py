@@ -17,7 +17,7 @@ def app():
     test_app = create_app()
 
     db_fd, db_path = tempfile.mkstemp()
-    test_app.config["SQLALCHEMY_DATABASE_URI"] = os.getenv('DATABASE')
+    test_app.config["SQLALCHEMY_DATABASE_URI"] = os.getenv('DATABASE_TESTING')
     test_app.config["TESTING"] = True
     test_app.config["WTF_CSRF_ENABLED"] = False
 

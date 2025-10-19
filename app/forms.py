@@ -4,7 +4,7 @@ from flask_wtf import FlaskForm
 from wtforms import StringField, SubmitField, BooleanField, DateTimeField
 from wtforms.validators import DataRequired, Length, Optional, ValidationError
 from .models import Shipment
-from .services import HelperMethods
+from .services import Services
 
 class Forms():
     class CreateShipmentForm(FlaskForm):
@@ -12,7 +12,7 @@ class Forms():
         registration_number = StringField(
             "Registration Number",
             validators=[DataRequired(), Length(min=1, max=50)],
-            filters=[HelperMethods.remove_delimiters]
+            filters=[Services.HelperMethods.remove_delimiters]
         )
         first_name = StringField(
             "First Name",

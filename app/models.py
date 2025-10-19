@@ -19,6 +19,7 @@ class Shipment(db.Model):
   checked_in_by = db.Column(db.String(30), nullable=True)
   checked_out_by = db.Column(db.String(30), nullable=True)
   archived = db.Column(db.Boolean, default=False)
+
   trailer_id = db.Column(db.String(15), db.ForeignKey('trailers.id'), nullable=True)
 
   trailer = db.relationship('Trailer', back_populates='shipments')
