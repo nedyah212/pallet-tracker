@@ -3,6 +3,10 @@ from .controllers import Controller
 
 main = Blueprint("main", __name__)
 
-@main.route("/", methods=["GET", "POST"])
+@main.route("/")
 def home():
-  return render_template("home.html", form=Controller.home())
+  return render_template("home.html")
+
+@main.route("/create_shipment", methods=["GET", "POST"])
+def create_shipment():
+  return render_template("create_shipment.html", form=Controller.create_shipment())

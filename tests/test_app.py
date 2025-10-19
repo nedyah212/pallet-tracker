@@ -4,8 +4,8 @@ import tempfile
 import sys
 from app.forms import Forms
 from app.services import HelperMethods
+from wtforms import ValidationError
 
-# Add parent directory to path
 sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), "..")))
 
 from app import create_app, db
@@ -72,7 +72,7 @@ class TestCreateShipmentForm:
         """Test form validation with valid data."""
         with app.app_context():
             form = Forms.CreateShipmentForm(data={
-                'registration_number': '8150-0939-2934',
+                'registration_number': '815009392934',
                 'first_name': 'John',
                 'last_name': 'Doe',
                 'tag_colour': 'Red',
@@ -147,6 +147,29 @@ class TestCreateShipmentForm:
                 'checked_out_by': 'Jane',
             })
             assert not form.validate()
+
+    def test_form_submit(self, app, client):
+        """Test Post, And For PK Violations"""
+        with app.app_context():
+            form = Forms.CreateShipmentForm(data={
+                'registration_number': '813601602025',
+                'first_name': 'John',
+                'last_name': 'Doe',
+                'tag_colour': 'Red',
+                'tag_code': 'ABC123',
+                'date_received': '2025-10-18 14:30:00',
+                'date_out': '2025-10-19 09:00:00',
+                'origin': 'Toronto',
+                'destination': 'Ottawa',
+                'driver_in': 'Mike',
+                'driver_out': 'Sarah',
+                'checked_in_by': 'John',
+                'checked_out_by': 'Jane',
+            })
+
+            #Update with proper route in future
+            response = client.post('/', data=form.data)
+            assert response.status_code == 200
 
 
 
