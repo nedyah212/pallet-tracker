@@ -31,15 +31,15 @@ def edit_shipment_type(registration_number):
 
 @main.route("/edit_type/<registration_number>/floor")
 def type_floor(registration_number):
-  return render_template("edit_type_floor.html", registration_number=registration_number)
+  return render_template("type_floor.html", registration_number=registration_number)
 
 @main.route("/edit_type/<registration_number>/pallet")
 def type_pallet(registration_number):
-  return render_template("edit_type_pallet.html", registration_number=registration_number)
+  return render_template("type_pallet.html", registration_number=registration_number)
 
 @main.route("/edit_type/<registration_number>/trailer")
 def type_trailer(registration_number):
-  return render_template("edit_type_trailer.html", registration_number=registration_number)
+  return render_template("type_trailer.html", registration_number=registration_number)
 
 @main.route("/settings")
 def settings():
