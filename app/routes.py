@@ -26,19 +26,19 @@ def show_shipment(registration_number):
   return render_template('show_shipment.html', registration_number=registration_number)
 
 @main.route("/edit_type/<registration_number>")
-def show_edit_shipment_type(registration_number):
+def edit_shipment_type(registration_number):
   return render_template("edit_shipment_type.html", registration_number=registration_number)
 
 @main.route("/edit_type/<registration_number>/floor")
-def edit_type_floor(registration_number):
+def type_floor(registration_number):
   return render_template("edit_type_floor.html", registration_number=registration_number)
 
 @main.route("/edit_type/<registration_number>/pallet")
-def edit_type_pallet(registration_number):
+def type_pallet(registration_number):
   return render_template("edit_type_pallet.html", registration_number=registration_number)
 
 @main.route("/edit_type/<registration_number>/trailer")
-def edit_type_trailer(registration_number):
+def type_trailer(registration_number):
   return render_template("edit_type_trailer.html", registration_number=registration_number)
 
 @main.route("/settings")
