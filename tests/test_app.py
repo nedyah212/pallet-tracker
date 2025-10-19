@@ -165,9 +165,7 @@ class TestCreateShipmentForm:
                 'checked_in_by': 'John',
                 'checked_out_by': 'Jane',
             })
-
-            #Update with proper route in future
-            response = client.post('/', data=form.data)
+            response = client.post('/create_shipment', data=form.data)
             assert response.status_code == 200
 
 
