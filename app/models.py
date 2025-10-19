@@ -1,6 +1,5 @@
 from app import db
 from sqlalchemy.ext.hybrid import hybrid_property
-from .services import HelperMethods
 
 class Shipment(db.Model):
   __tablename__ = "shipments"
