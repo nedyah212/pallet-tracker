@@ -3,7 +3,7 @@ import os
 import tempfile
 import sys
 from app.forms import Forms
-from app.services import HelperMethods
+from app.services import Services
 from wtforms import ValidationError
 
 sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), "..")))
@@ -51,14 +51,14 @@ class TestHelperMethods:
 
     def test_boolean_to_status_string(self):
         """Test method for satisfactory functionality"""
-        helper = HelperMethods()
+        helper = Services.HelperMethods()
         assert helper.boolean_to_status_string(True) == "At Capacity"
         assert helper.boolean_to_status_string(False) == "Not at Capacity"
         assert helper.boolean_to_status_string(None) == ""
 
     def test_remove_delimiters(self):
         """Test remove delimiters for functionality"""
-        helper = HelperMethods()
+        helper = Services.HelperMethods()
         assert helper.remove_delimiters("8136-0025-2025") == "813600252025"
         assert helper.remove_delimiters("8136--0025--2025") == "813600252025"
         assert helper.remove_delimiters("8136 0025 2025") == "813600252025"
