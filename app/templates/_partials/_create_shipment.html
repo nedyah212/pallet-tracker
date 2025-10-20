@@ -1,7 +1,7 @@
 <!---Requires CreateShipment in forms.py--->
   <section id="create-shipment-form" class="form">
     <strong><u>Add a Shipment</u></strong>
-    <form action="POST">
+    <form method="POST">
       {{ form.hidden_tag() }}
 
       <!-- Identifier -->
@@ -69,6 +69,9 @@
       <div class="form-group">
         {{ form.checked_out_by.label }}
         {{ form.checked_out_by }}
+      </div>
+      <div>
+        <button name='create_shipment'type="submit" class="btn btn-primary">Submit</button>
       </div>
     </form>
   </section>

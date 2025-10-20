@@ -10,13 +10,14 @@ sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), "..")
 
 from app import create_app, db
 
+
 @pytest.fixture
 def app():
     """Create application instance for testing."""
     test_app = create_app()
 
     db_fd, db_path = tempfile.mkstemp()
-    test_app.config["SQLALCHEMY_DATABASE_URI"] = 'sqlite:///:memory:'
+    test_app.config["SQLALCHEMY_DATABASE_URI"] = "sqlite:///:memory:"
     test_app.config["TESTING"] = True
     test_app.config["WTF_CSRF_ENABLED"] = False
 
@@ -45,6 +46,7 @@ class TestHomePage:
         assert response.status_code == 200
         assert b"<!DOCTYPE html>" in response.data or b"<html" in response.data
 
+
 class TestHelperMethods:
     """Test helper functions for functionality"""
 
@@ -65,109 +67,119 @@ class TestHelperMethods:
         assert helper.remove_delimiters("8136/0025/2025") == "813600252025"
         assert helper.remove_delimiters(None) == ""
 
+
 class TestCreateShipmentForm:
     """Test create shipment form for functionality"""
+
     def test_form_valid(self, app):
         """Test form validation with valid data."""
         with app.app_context():
-            form = Forms.CreateShipmentForm(data={
-                'registration_number': '815009392934',
-                'first_name': 'John',
-                'last_name': 'Doe',
-                'tag_colour': 'Red',
-                'tag_code': 'ABC123',
-                'date_received': '2025-10-18 14:30:00',
-                'date_out': '2025-10-19 09:00:00',
-                'origin': 'Toronto',
-                'destination': 'Ottawa',
-                'driver_in': 'Mike',
-                'driver_out': 'Sarah',
-                'checked_in_by': 'John',
-                'checked_out_by': 'Jane',
-            })
+            form = Forms.CreateShipmentForm(
+                data={
+                    "registration_number": "815009392934",
+                    "first_name": "John",
+                    "last_name": "Doe",
+                    "tag_colour": "Red",
+                    "tag_code": "ABC123",
+                    "date_received": "2025-10-18 14:30:00",
+                    "date_out": "2025-10-19 09:00:00",
+                    "origin": "Toronto",
+                    "destination": "Ottawa",
+                    "driver_in": "Mike",
+                    "driver_out": "Sarah",
+                    "checked_in_by": "John",
+                    "checked_out_by": "Jane",
+                }
+            )
             assert form.validate()
 
     def test_form_invalid(self, app):
         """Test form validation with invalid data"""
         with app.app_context():
-            form = Forms.CreateShipmentForm(data={
-                'registration_number': '',
-                'first_name': 'John',
-                'last_name': 'Doe',
-                'tag_colour': 'Red',
-                'tag_code': 'ABC123',
-                'date_received': '2025-10-18 14:30:00',
-                'date_out': '2025-10-19 09:00:00',
-                'origin': 'Toronto',
-                'destination': 'Ottawa',
-                'driver_in': 'Mike',
-                'driver_out': 'Sarah',
-                'checked_in_by': 'John',
-                'checked_out_by': 'Jane',
-            })
+            form = Forms.CreateShipmentForm(
+                data={
+                    "registration_number": "",
+                    "first_name": "John",
+                    "last_name": "Doe",
+                    "tag_colour": "Red",
+                    "tag_code": "ABC123",
+                    "date_received": "2025-10-18 14:30:00",
+                    "date_out": "2025-10-19 09:00:00",
+                    "origin": "Toronto",
+                    "destination": "Ottawa",
+                    "driver_in": "Mike",
+                    "driver_out": "Sarah",
+                    "checked_in_by": "John",
+                    "checked_out_by": "Jane",
+                }
+            )
             assert not form.validate()
 
     def test_form_requirements(self, app):
         """Test Non PK Field That Is Required"""
         with app.app_context():
-            form = Forms.CreateShipmentForm(data={
-                'registration_number': '',
-                'first_name': 'John',
-                'last_name': 'Doe',
-                'tag_colour': 'Red',
-                'tag_code': 'ABC123',
-                'date_received': '2025-10-18 14:30:00',
-                'date_out': '2025-10-19 09:00:00',
-                'origin': '',
-                'destination': 'Ottawa',
-                'driver_in': 'Mike',
-                'driver_out': 'Sarah',
-                'checked_in_by': 'John',
-                'checked_out_by': 'Jane',
-            })
+            form = Forms.CreateShipmentForm(
+                data={
+                    "registration_number": "",
+                    "first_name": "John",
+                    "last_name": "Doe",
+                    "tag_colour": "Red",
+                    "tag_code": "ABC123",
+                    "date_received": "2025-10-18 14:30:00",
+                    "date_out": "2025-10-19 09:00:00",
+                    "origin": "",
+                    "destination": "Ottawa",
+                    "driver_in": "Mike",
+                    "driver_out": "Sarah",
+                    "checked_in_by": "John",
+                    "checked_out_by": "Jane",
+                }
+            )
             assert not form.validate()
 
     def test_form_optional_field(self, app):
         """Test Non PK Field That Is Optional"""
         with app.app_context():
-            form = Forms.CreateShipmentForm(data={
-                'registration_number': '',
-                'first_name': 'John',
-                'last_name': 'Doe',
-                'tag_colour': 'Red',
-                'tag_code': 'ABC123',
-                'date_received': '2025-10-18 14:30:00',
-                'date_out': '2025-10-19 09:00:00',
-                'origin': 'Toronto',
-                'destination': '',
-                'driver_in': 'Mike',
-                'driver_out': 'Sarah',
-                'checked_in_by': 'John',
-                'checked_out_by': 'Jane',
-            })
+            form = Forms.CreateShipmentForm(
+                data={
+                    "registration_number": "",
+                    "first_name": "John",
+                    "last_name": "Doe",
+                    "tag_colour": "Red",
+                    "tag_code": "ABC123",
+                    "date_received": "2025-10-18 14:30:00",
+                    "date_out": "2025-10-19 09:00:00",
+                    "origin": "Toronto",
+                    "destination": "",
+                    "driver_in": "Mike",
+                    "driver_out": "Sarah",
+                    "checked_in_by": "John",
+                    "checked_out_by": "Jane",
+                }
+            )
             assert not form.validate()
 
     def test_form_submit(self, app, client):
         """Test Post, And For PK Violations"""
         with app.app_context():
-            form = Forms.CreateShipmentForm(data={
-                'registration_number': '813601602025',
-                'first_name': 'John',
-                'last_name': 'Doe',
-                'tag_colour': 'Red',
-                'tag_code': 'ABC123',
-                'date_received': '2025-10-18 14:30:00',
-                'date_out': '2025-10-19 09:00:00',
-                'origin': 'Toronto',
-                'destination': 'Ottawa',
-                'driver_in': 'Mike',
-                'driver_out': 'Sarah',
-                'checked_in_by': 'John',
-                'checked_out_by': 'Jane',
-            })
-            response = client.post('/create_shipment', data=form.data, follow_redirects=True)
+            form = Forms.CreateShipmentForm(
+                data={
+                    "registration_number": "813601602025",
+                    "first_name": "John",
+                    "last_name": "Doe",
+                    "tag_colour": "Red",
+                    "tag_code": "ABC123",
+                    "date_received": "2025-10-18 14:30:00",
+                    "date_out": "2025-10-19 09:00:00",
+                    "origin": "Toronto",
+                    "destination": "Ottawa",
+                    "driver_in": "Mike",
+                    "driver_out": "Sarah",
+                    "checked_in_by": "John",
+                    "checked_out_by": "Jane",
+                }
+            )
+            response = client.post(
+                "/create_shipment", data=form.data, follow_redirects=True
+            )
             assert response.status_code == 200
-
-
-
-

@@ -6,13 +6,14 @@ from wtforms.validators import DataRequired, Length, Optional, ValidationError
 from .models import Shipment
 from .services import Services
 
-class Forms():
+
+class Forms:
     class CreateShipmentForm(FlaskForm):
 
         registration_number = StringField(
             "Registration Number",
             validators=[DataRequired(), Length(min=1, max=50)],
-            filters=[Services.HelperMethods.remove_delimiters]
+            filters=[Services.HelperMethods.remove_delimiters],
         )
         first_name = StringField(
             "First Name",
@@ -34,7 +35,7 @@ class Forms():
             "Date Received",
             format="%Y-%m-%d %H:%M:%S",
             validators=[DataRequired()],
-            default=datetime.now
+            default=datetime.now,
         )
         date_out = DateTimeField(
             "Date Out",
@@ -71,10 +72,11 @@ class Forms():
         submit = SubmitField("Save Shipment")
 
         def validate_registration_number(self, registration_number):
-            shipment = Shipment.query.filter_by(registration_number=registration_number.data).first()
+            shipment = Shipment.query.filter_by(
+                registration_number=registration_number.data
+            ).first()
             if shipment:
                 logger.warning(
                     f"ConstraintViolation: {registration_number} allready exists in the database"
-
                 )
                 raise ValidationError("The registration number must be unique.")
