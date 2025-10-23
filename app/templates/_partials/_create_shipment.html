@@ -1,16 +1,13 @@
-<!---Requires CreateShipment in forms.py--->
   <section id="create-shipment-form" class="form">
     <strong><u>Add a Shipment</u></strong>
     <form method="POST">
       {{ form.hidden_tag() }}
 
-      <!-- Identifier -->
       <div class="form-group">
         {{ form.registration_number.label }}
         {{ form.registration_number }}
       </div>
 
-      <!-- Shipper -->
       <div class="form-group">
         {{ form.first_name.label }}
         {{ form.first_name }}
@@ -21,7 +18,6 @@
         {{ form.last_name }}
       </div>
 
-      <!-- Routing -->
       <div class="form-group">
         {{ form.origin.label }}
         {{ form.origin }}
@@ -31,7 +27,6 @@
         {{ form.destination }}
       </div>
 
-      <!-- Tagging -->
       <div class="form-group">
         {{ form.tag_colour.label }}
         {{ form.tag_colour }}
@@ -41,7 +36,6 @@
         {{ form.tag_code }}
       </div>
 
-      <!-- Dates -->
       <div class="form-group">
         {{ form.date_received.label }}
         {{ form.date_received }}
@@ -51,7 +45,6 @@
         {{ form.date_out }}
       </div>
 
-      <!-- Drivers -->
       <div class="form-group">
         {{ form.driver_in.label }}
         {{ form.driver_in }}
@@ -61,7 +54,6 @@
         {{ form.driver_out }}
       </div>
 
-      <!-- Checking -->
       <div class="form-group">
         {{ form.checked_in_by.label }}
         {{ form.checked_in_by }}

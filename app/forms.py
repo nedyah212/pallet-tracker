@@ -1,13 +1,14 @@
 from datetime import datetime
 from .logging import logger
 from flask_wtf import FlaskForm
-from wtforms import StringField, SubmitField, BooleanField, DateTimeField
+from wtforms import StringField, SubmitField, BooleanField, DateTimeField, RadioField
 from wtforms.validators import DataRequired, Length, Optional, ValidationError
 from .models import Shipment
 from .services import Services
 
 
 class Forms:
+
     class CreateShipmentForm(FlaskForm):
 
         registration_number = StringField(
@@ -80,3 +81,11 @@ class Forms:
                     f"ConstraintViolation: {registration_number.data} allready exists in the database"
                 )
                 raise ValidationError("The registration number must be unique.")
+
+    class EditTypeForm(FlaskForm):
+        choice = RadioField(
+            "Choose an Option",
+            choices=[("floor", "Floor"), ("pallet", "Pallet"), ("trailer", "Trailer")],
+            validators=[DataRequired()],
+        )
+        submit = SubmitField("Submit")

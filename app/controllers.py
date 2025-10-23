@@ -2,6 +2,7 @@ from .forms import Forms
 
 
 class Controller:
+
     def home():
         return "pass"
 
@@ -12,7 +13,7 @@ class Controller:
         return "pass"
 
     def edit_shipment():
-        return "pass"
+        return Forms.EditTypeForm()
 
     def type_floor():
         return "pass"
@@ -31,3 +32,19 @@ class Controller:
 
     def trailer_manager():
         return "pass"
+
+    @staticmethod
+    def handle_choice(choice):
+        if choice == "floor":
+            route = "main.type_floor"
+
+        elif choice == "pallet":
+            route = "main.type_pallet"
+
+        elif choice == "trailer":
+            route = "main.type_trailer"
+
+        else:
+            route = None
+
+        return route

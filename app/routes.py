@@ -13,16 +13,15 @@ def home():
 @main.route("/create_shipment", methods=["GET", "POST"])
 def create_shipment():
     form = Controller.create_shipment()
+
     if form.validate_on_submit():
-        shipment = Services.ConstructorMethods.create_shipment_object(form)
+        shipment = Services.ConstructorMethods.create_shipment_object(
+            form
+        ).registration_number
         success = Services.DatabaseMethods.create_shipment(shipment)
 
         if success:
-            return redirect(
-                url_for(
-                    "main.edit_type", registration_number=shipment.registration_number
-                )
-            )
+            return redirect(url_for("main.edit_type", registration_number=shipment))
 
     return render_template("shipment/create.html", form=form)
 
@@ -34,10 +33,17 @@ def show_shipment(registration_number):
     )
 
 
-@main.route("/edit_type/<registration_number>")
+@main.route("/edit_type/<registration_number>", methods=["GET", "POST"])
 def edit_type(registration_number):
+    form = Controller.edit_shipment()
+
+    if form.validate_on_submit():
+        choice = form.choice.data
+        endpoint = Controller.handle_choice(choice)
+        return redirect(url_for(endpoint, registration_number=registration_number))
+
     return render_template(
-        "shipment/edit_type.html", registration_number=registration_number
+        "shipment/edit_type.html", registration_number=registration_number, form=form
     )
 
 
