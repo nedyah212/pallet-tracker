@@ -7,6 +7,7 @@ from .models import Shipment
 class Services:
 
     class HelperMethods:
+
         def boolean_to_status_string(self, boolean):
             return (
                 "At Capacity"
@@ -29,6 +30,34 @@ class Services:
                 db.session.commit()
                 logger.info(f"Success: {shipment} has been added to the database.")
                 return True
+            except IntegrityError as e:
+                logger.error(f"IntegrityError: {e}")
+                db.session.rollback()
+                return False
+            except OperationalError as e:
+                logger.error(f"OperationalError: {e}")
+                db.session.rollback()
+                return False
+            except SQLAlchemyError as e:
+                logger.error(f"SQLAlchemyError: {e}")
+                db.session.rollback()
+                return False
+
+        def get_shipment(registration_number):
+            try:
+                shipment = Shipment.query.get(registration_number)
+                logger.info(
+                    f"Success: Database queried by primary key: {registration_number}."
+                )
+            except OperationalError as e:
+                logger.error(f"OperationalError: {e}")
+            except SQLAlchemyError as e:
+                logger.error(f"SQLAlchemyError: {e}")
+            return shipment
+
+        def update_shipment(shipment):
+            try:
+                db.session.commit()
             except IntegrityError as e:
                 logger.error(f"IntegrityError: {e}")
                 db.session.rollback()

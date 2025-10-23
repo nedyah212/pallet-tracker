@@ -40,10 +40,9 @@ def edit_type(registration_number):
     form = Controller.edit_shipment()
 
     if form.validate_on_submit():
-        choice = form.choice.data
         return redirect(
             url_for(
-                Controller.handle_choice(choice),
+                Controller.handle_choice(form.choice.data),
                 registration_number=registration_number,
             )
         )
@@ -55,9 +54,10 @@ def edit_type(registration_number):
 
 @main.route("/edit_type/<registration_number>/floor", methods=["GET", "POST"])
 def type_floor(registration_number):
-    form = Controller.type_floor()
+    data = Controller.type_floor(registration_number)
 
-    if form.is_submitted():
+    if data["form"].is_submitted():
+        Controller.handle_move_from_trailer(data["shipment"])
         return redirect(url_for("main.home"))
 
     return render_template(
@@ -67,9 +67,10 @@ def type_floor(registration_number):
 
 @main.route("/edit_type/<registration_number>/pallet", methods=["GET", "POST"])
 def type_pallet(registration_number):
-    form = Controller.type_pallet()
+    data = Controller.type_pallet(registration_number)
 
-    if form.is_submitted():
+    if data["form"].is_submitted():
+        Controller.handle_move_from_trailer(data["shipment"])
         return redirect(url_for("main.home"))
 
     return render_template(
@@ -79,9 +80,11 @@ def type_pallet(registration_number):
 
 @main.route("/edit_type/<registration_number>/trailer", methods=["GET", "POST"])
 def type_trailer(registration_number):
-    form = Controller.type_trailer()
+    data = Controller.type_floor(registration_number)
 
-    if form.is_submitted():
+    if data["form"].is_submitted():
+        ## implement once you have a dropdown for trailer_id on form
+        ##Controller.handle_move_to_trailer(registration_number, trailer_id)
         return redirect(url_for("main.home"))
 
     return render_template(

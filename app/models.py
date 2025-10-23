@@ -19,6 +19,7 @@ class Shipment(db.Model):
     checked_in_by = db.Column(db.String(30), nullable=True)
     checked_out_by = db.Column(db.String(30), nullable=True)
     archived = db.Column(db.Boolean, default=False)
+    shipment_type = db.Column(db.String(7), default=0)
 
     trailer_id = db.Column(db.String(15), db.ForeignKey("trailers.id"), nullable=True)
 
@@ -52,7 +53,6 @@ class Trailer(db.Model):
     __tablename__ = "trailers"
 
     id = db.Column(db.String(15), primary_key=True)
-    location = db.Column(db.String(25), nullable=False)
     status = db.Column(db.Boolean)
 
     shipments = db.relationship(
