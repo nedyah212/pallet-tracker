@@ -1,7 +1,7 @@
 from . import db
 from .logging import logger
 from sqlalchemy.exc import IntegrityError, OperationalError, SQLAlchemyError
-from .models import Shipment, Pallet
+from .models import Shipment, Pallet, Trailer, OversizedGood
 
 
 class Services:
@@ -103,3 +103,21 @@ class Services:
                 checked_out_by=form.checked_out_by.data,
             )
             return shipment
+
+        def create_pallet_object(form, registration_number):
+            pallet = Pallet(
+                id=form.id.data,
+                row=form.row.data or None,
+                registration_number=registration_number,
+            )
+            return pallet
+
+        def create_trailer_object(form, trailer_id):
+            trailer = Trailer(id=trailer_id, status=form.id.data)
+            return trailer
+
+        def create_oversized_good(form, desc, loc, reg):
+            oversized_good = OversizedGood(
+                description=desc, location=loc, registration_number=reg
+            )
+            return oversized_good

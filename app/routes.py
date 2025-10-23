@@ -57,8 +57,7 @@ def type_floor(registration_number):
     data = Controller.type_floor(registration_number)
 
     if data["form"].is_submitted():
-        Controller.handle_move_from_trailer(data["shipment"])
-        Controller.handle_move_from_pallets(registration_number)
+        Controller.remove_pallet_or_trailer(data["shipment"], registration_number)
         return redirect(url_for("main.home"))
 
     return render_template(
@@ -71,7 +70,8 @@ def type_pallet(registration_number):
     data = Controller.type_pallet(registration_number)
 
     if data["form"].is_submitted():
-        Controller.handle_move_from_trailer(data["shipment"])
+        Controller.remove_pallet_or_trailer(shipment=data["shipment"])
+        Controller.handle_move_to_pallet()  # to implement
         return redirect(url_for("main.home"))
 
     return render_template(
@@ -86,7 +86,7 @@ def type_trailer(registration_number):
     if data["form"].is_submitted():
         ## implement once you have a dropdown for trailer_id on form
         ##Controller.handle_move_to_trailer(registration_number, trailer_id)
-        Controller.handle_move_from_pallets(registration_number)
+        Controller.handle_move_to_trailer(registration_number=registration_number)
         return redirect(url_for("main.home"))
 
     return render_template(
