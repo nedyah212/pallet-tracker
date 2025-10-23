@@ -19,7 +19,6 @@ class Shipment(db.Model):
     checked_in_by = db.Column(db.String(30), nullable=True)
     checked_out_by = db.Column(db.String(30), nullable=True)
     archived = db.Column(db.Boolean, default=False)
-    shipment_type = db.Column(db.String(7), default=0)
 
     trailer_id = db.Column(db.String(15), db.ForeignKey("trailers.id"), nullable=True)
 

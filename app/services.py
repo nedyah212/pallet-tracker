@@ -1,7 +1,7 @@
 from . import db
 from .logging import logger
 from sqlalchemy.exc import IntegrityError, OperationalError, SQLAlchemyError
-from .models import Shipment
+from .models import Shipment, Pallet
 
 
 class Services:
@@ -47,7 +47,7 @@ class Services:
             try:
                 shipment = Shipment.query.get(registration_number)
                 logger.info(
-                    f"Success: Database queried by primary key: {registration_number}."
+                    f"Success: Database queried for shipment by registration number."
                 )
             except OperationalError as e:
                 logger.error(f"OperationalError: {e}")
@@ -55,7 +55,7 @@ class Services:
                 logger.error(f"SQLAlchemyError: {e}")
             return shipment
 
-        def update_shipment(shipment):
+        def update(shipment):
             try:
                 db.session.commit()
             except IntegrityError as e:
@@ -70,6 +70,20 @@ class Services:
                 logger.error(f"SQLAlchemyError: {e}")
                 db.session.rollback()
                 return False
+
+        def get_pallets(registration_number):
+            try:
+                pallets = Pallet.query.filter_by(
+                    registration_number=registration_number
+                ).all()
+                logger.info(
+                    f"Success: Database queried for pallets by registration number."
+                )
+            except OperationalError as e:
+                logger.error(f"OperationalError: {e}")
+            except SQLAlchemyError as e:
+                logger.error(f"SQLAlchemyError: {e}")
+            return pallets
 
     class ConstructorMethods:
         def create_shipment_object(form):
