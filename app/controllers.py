@@ -16,13 +16,13 @@ class Controller:
         return Forms.EditTypeForm()
 
     def type_floor():
-        return "pass"
+        return Forms.EditTypeFloorForm()
 
     def type_pallet():
-        return "pass"
+        return Forms.EditTypePalletForm()
 
     def type_trailer():
-        return "pass"
+        return Forms.EditTypeTrailerForm()
 
     def settings():
         return "pass"
@@ -35,15 +35,13 @@ class Controller:
 
     @staticmethod
     def handle_choice(choice):
+
         if choice == "floor":
             route = "main.type_floor"
-
         elif choice == "pallet":
             route = "main.type_pallet"
-
         elif choice == "trailer":
             route = "main.type_trailer"
-
         else:
             route = None
 

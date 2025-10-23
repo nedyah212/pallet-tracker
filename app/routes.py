@@ -15,13 +15,15 @@ def create_shipment():
     form = Controller.create_shipment()
 
     if form.validate_on_submit():
-        shipment = Services.ConstructorMethods.create_shipment_object(
-            form
-        ).registration_number
+        shipment = Services.ConstructorMethods.create_shipment_object(form)
         success = Services.DatabaseMethods.create_shipment(shipment)
 
         if success:
-            return redirect(url_for("main.edit_type", registration_number=shipment))
+            return redirect(
+                url_for(
+                    "main.edit_type", registration_number=shipment.registration_number
+                )
+            )
 
     return render_template("shipment/create.html", form=form)
 
@@ -39,30 +41,49 @@ def edit_type(registration_number):
 
     if form.validate_on_submit():
         choice = form.choice.data
-        endpoint = Controller.handle_choice(choice)
-        return redirect(url_for(endpoint, registration_number=registration_number))
+        return redirect(
+            url_for(
+                Controller.handle_choice(choice),
+                registration_number=registration_number,
+            )
+        )
 
     return render_template(
         "shipment/edit_type.html", registration_number=registration_number, form=form
     )
 
 
-@main.route("/edit_type/<registration_number>/floor")
+@main.route("/edit_type/<registration_number>/floor", methods=["GET", "POST"])
 def type_floor(registration_number):
+    form = Controller.type_floor()
+
+    if form.is_submitted():
+        return redirect(url_for("main.home"))
+
     return render_template(
         "shipment/type_floor.html", registration_number=registration_number
     )
 
 
-@main.route("/edit_type/<registration_number>/pallet")
+@main.route("/edit_type/<registration_number>/pallet", methods=["GET", "POST"])
 def type_pallet(registration_number):
+    form = Controller.type_pallet()
+
+    if form.is_submitted():
+        return redirect(url_for("main.home"))
+
     return render_template(
         "shipment/type_pallet.html", registration_number=registration_number
     )
 
 
-@main.route("/edit_type/<registration_number>/trailer")
+@main.route("/edit_type/<registration_number>/trailer", methods=["GET", "POST"])
 def type_trailer(registration_number):
+    form = Controller.type_trailer()
+
+    if form.is_submitted():
+        return redirect(url_for("main.home"))
+
     return render_template(
         "shipment/type_trailer.html", registration_number=registration_number
     )

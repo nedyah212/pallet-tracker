@@ -89,3 +89,12 @@ class Forms:
             validators=[DataRequired()],
         )
         submit = SubmitField("Submit")
+
+    class EditTypeFloorForm(FlaskForm):
+        submit = SubmitField("Set as Floor")
+
+    class EditTypePalletForm(FlaskForm):
+        submit = SubmitField("Set as Pallet")
+
+    class EditTypeTrailerForm(FlaskForm):
+        submit = SubmitField("Set as Trailer")
