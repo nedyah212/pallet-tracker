@@ -5,6 +5,7 @@ from .models import Shipment
 
 
 class Services:
+
     class HelperMethods:
         def boolean_to_status_string(self, boolean):
             return (
@@ -22,8 +23,7 @@ class Services:
             )
 
     class DatabaseMethods:
-        def create_shipment(form):
-            shipment = Services.ConstructorMethods.create_shipment_object(form)
+        def create_shipment(shipment):
             try:
                 db.session.add(shipment)
                 db.session.commit()

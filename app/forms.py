@@ -77,6 +77,6 @@ class Forms:
             ).first()
             if shipment:
                 logger.warning(
-                    f"ConstraintViolation: {registration_number} allready exists in the database"
+                    f"ConstraintViolation: {registration_number.data} allready exists in the database"
                 )
                 raise ValidationError("The registration number must be unique.")

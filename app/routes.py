@@ -1,4 +1,4 @@
-from flask import Blueprint, render_template, redirect
+from flask import Blueprint, render_template, redirect, url_for
 from .controllers import Controller
 from .services import Services
 
@@ -14,10 +14,15 @@ def home():
 def create_shipment():
     form = Controller.create_shipment()
     if form.validate_on_submit():
-        success = Services.DatabaseMethods.create_shipment(form)
+        shipment = Services.ConstructorMethods.create_shipment_object(form)
+        success = Services.DatabaseMethods.create_shipment(shipment)
 
         if success:
-            return redirect("/")
+            return redirect(
+                url_for(
+                    "main.edit_type", registration_number=shipment.registration_number
+                )
+            )
 
     return render_template("shipment/create.html", form=form)
 
@@ -30,7 +35,7 @@ def show_shipment(registration_number):
 
 
 @main.route("/edit_type/<registration_number>")
-def edit_shipment_type(registration_number):
+def edit_type(registration_number):
     return render_template(
         "shipment/edit_type.html", registration_number=registration_number
     )
