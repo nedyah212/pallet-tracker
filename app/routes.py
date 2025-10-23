@@ -94,16 +94,23 @@ def type_trailer(registration_number):
     )
 
 
-@main.route("/settings")
+@main.route("/settings", methods=["GET", "POST"])
 def settings():
-    return render_template("settings/settings.html")
+    form = Controller.settings()
+    if form.validate_on_submit():
+        return redirect(
+            url_for(
+                Controller.handle_choice(form.choice.data),
+            )
+        )
+    return render_template("settings/settings.html", form=form)
 
 
-@main.route("/settings/pallet_manager")
-def pallet_manager():
+@main.route("/settings/pallet")
+def pallet():
     return render_template("settings/pallet.html")
 
 
-@main.route("/settings/trailer_manager")
-def trailer_manager():
+@main.route("/settings/trailer")
+def trailer():
     return render_template("settings/trailer.html")

@@ -37,23 +37,22 @@ class Controller:
         }
 
     def settings():
+        return Forms.EditSettingForm()
+
+    def pallet():
         return "pass"
 
-    def pallet_manager():
-        return "pass"
-
-    def trailer_manager():
+    def trailer():
         return "pass"
 
     @staticmethod
-    def handle_choice(choice):
-
+    def handle_choice(choice, alt=False):
         if choice == "floor":
             route = "main.type_floor"
         elif choice == "pallet":
-            route = "main.type_pallet"
+            route = "main.type_pallet" if alt else "main.pallet"
         elif choice == "trailer":
-            route = "main.type_trailer"
+            route = "main.type_trailer" if alt else "main.trailer"
         else:
             route = None
 

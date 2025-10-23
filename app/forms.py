@@ -1,7 +1,14 @@
 from datetime import datetime
 from .logging import logger
 from flask_wtf import FlaskForm
-from wtforms import StringField, SubmitField, BooleanField, DateTimeField, RadioField
+from wtforms import (
+    TextAreaField,
+    StringField,
+    SubmitField,
+    BooleanField,
+    DateTimeField,
+    RadioField,
+)
 from wtforms.validators import DataRequired, Length, Optional, ValidationError
 from .models import Shipment
 from .services import Services
@@ -88,6 +95,16 @@ class Forms:
             "Choose an Option",
             choices=[("floor", "Floor"), ("pallet", "Pallet"), ("trailer", "Trailer")],
             validators=[DataRequired()],
+            default="pallet",
+        )
+        submit = SubmitField("Submit")
+
+    class EditSettingForm(FlaskForm):
+        choice = RadioField(
+            "Choose an Option",
+            choices=[("pallet", "Pallet"), ("trailer", "Trailer")],
+            validators=[DataRequired()],
+            default="pallet",
         )
         submit = SubmitField("Submit")
 
