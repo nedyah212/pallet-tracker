@@ -89,7 +89,7 @@ pipeline {
                                 docker pull ${NEXUS_REGISTRY_IP}/${IMAGE_NAME}:${BUILD_NUMBER} && \
                                 docker stop ${IMAGE_NAME} || true && \
                                 docker rm ${IMAGE_NAME} || true && \
-                                docker run -d --name ${IMAGE_NAME} -p ${STAGING_SERVER_PORT}:${CONTAINER_PORT} ${NEXUS_REGISTRY_IP}/${IMAGE_NAME}:${BUILD_NUMBER}"
+                                docker run -d --name ${IMAGE_NAME} -p ${STAGING_SERVER_PORT}:${CONTAINER_PORT} -v /home/nedyah/.env:/app/.env ${NEXUS_REGISTRY_IP}/${IMAGE_NAME}:${BUILD_NUMBER}"
                         """
                         echo "Container deployed on staging"
                     }
@@ -133,7 +133,7 @@ pipeline {
                                 docker pull ${NEXUS_REGISTRY_IP}/${IMAGE_NAME}:${BUILD_NUMBER} && \
                                 docker stop ${IMAGE_NAME} || true && \
                                 docker rm ${IMAGE_NAME} || true && \
-                                docker run -d --name ${IMAGE_NAME} -p ${PROD_SERVER_PORT}:${CONTAINER_PORT} ${NEXUS_REGISTRY_IP}/${IMAGE_NAME}:${BUILD_NUMBER}"
+                                docker run -d --name ${IMAGE_NAME} -p ${PROD_SERVER_PORT}:${CONTAINER_PORT} -v /home/nedyah/.env:/app/.env ${NEXUS_REGISTRY_IP}/${IMAGE_NAME}:${BUILD_NUMBER}"
                         """
                         echo "Container deployed on production"
                     }
