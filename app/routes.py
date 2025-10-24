@@ -75,7 +75,9 @@ def type_pallet(registration_number):
         return redirect(url_for("main.home"))
 
     return render_template(
-        "shipment/type_pallet.html", registration_number=registration_number
+        "shipment/type_pallet.html",
+        registration_number=registration_number,
+        form=data["form"],
     )
 
 
@@ -96,7 +98,7 @@ def type_trailer(registration_number):
 
 @main.route("/settings", methods=["GET", "POST"])
 def settings():
-    form = Controller.settings()
+    form = Controller.settings()["setting-form"]
     if form.validate_on_submit():
         return redirect(
             url_for(
@@ -108,11 +110,11 @@ def settings():
 
 @main.route("/settings/pallet")
 def pallet():
-    form = Controller.pallet()
-    return render_template("settings/pallet.html", form=form)
+    data = Controller.settings()["batch-form"]
+    return render_template("settings/pallet.html", form=data)
 
 
 @main.route("/settings/trailer")
 def trailer():
-    form = Controller.trailer()
-    return render_template("settings/trailer.html", form=form)
+    data = Controller.settings()["batch-form"]
+    return render_template("settings/trailer.html", form=data)

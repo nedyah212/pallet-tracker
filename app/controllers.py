@@ -25,7 +25,7 @@ class Controller:
     def type_pallet(registration_number):
         Services.DatabaseMethods.get_shipment(registration_number)
         return {
-            "form": Forms.EditTypePalletForm(),
+            "form": Forms.BatchEntryForm(),
             "shipment": Services.DatabaseMethods.get_shipment(registration_number),
         }
 
@@ -37,13 +37,10 @@ class Controller:
         }
 
     def settings():
-        return Forms.EditSettingForm()
-
-    def pallet():
-        return Forms.BatchEntryForm()
-
-    def trailer():
-        return Forms.BatchEntryForm()
+        return {
+            "setting-form": Forms.EditSettingForm(),
+            "batch-form": Forms.BatchEntryForm(),
+        }
 
     @staticmethod
     def handle_choice(choice, alt=False):
@@ -73,13 +70,15 @@ class Controller:
                 Services.DatabaseMethods.update(pallet)
 
     # Needs validation to check if trailer is full
+    # Needs to verify that trailer is there
     @staticmethod
     def handle_move_to_trailer(shipment, trailer_id):
         if shipment and trailer_id:
             shipment.trailer_id = trailer_id
             Services.DatabaseMethods.update(shipment)
 
-    # Needs validation to check if pallet is full
+    # Needs validation to verify pallet is empty
+    # Needs valiadatoin to verify pallet exists
     @staticmethod
     def handle_move_to_pallet(shipment, pallets):
         pass
