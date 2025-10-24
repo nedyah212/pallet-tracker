@@ -42,7 +42,7 @@ def edit_type(registration_number):
     if form.validate_on_submit():
         return redirect(
             url_for(
-                Controller.handle_choice(form.choice.data),
+                Controller.handle_choice(form.choice.data, alt=True),
                 registration_number=registration_number,
             )
         )
@@ -81,7 +81,7 @@ def type_pallet(registration_number):
 
 @main.route("/edit_type/<registration_number>/trailer", methods=["GET", "POST"])
 def type_trailer(registration_number):
-    data = Controller.type_floor(registration_number)
+    data = Controller.type_trailer(registration_number)
 
     if data["form"].is_submitted():
         ## implement once you have a dropdown for trailer_id on form
@@ -108,9 +108,11 @@ def settings():
 
 @main.route("/settings/pallet")
 def pallet():
-    return render_template("settings/pallet.html")
+    form = Controller.pallet()
+    return render_template("settings/pallet.html", form=form)
 
 
 @main.route("/settings/trailer")
 def trailer():
-    return render_template("settings/trailer.html")
+    form = Controller.trailer()
+    return render_template("settings/trailer.html", form=form)

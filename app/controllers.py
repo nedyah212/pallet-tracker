@@ -40,10 +40,10 @@ class Controller:
         return Forms.EditSettingForm()
 
     def pallet():
-        return "pass"
+        return Forms.BatchEntryForm()
 
     def trailer():
-        return "pass"
+        return Forms.BatchEntryForm()
 
     @staticmethod
     def handle_choice(choice, alt=False):

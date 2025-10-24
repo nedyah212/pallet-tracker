@@ -108,6 +108,18 @@ class Forms:
         )
         submit = SubmitField("Submit")
 
+    class BatchEntryForm(FlaskForm):
+        selection = TextAreaField(
+            "Pallets",
+            validators=[DataRequired(message="Please enter pallet data")],
+            render_kw={
+                "rows": 10,
+                "cols": 50,
+                "placeholder": "Enter identifier separated by commas",
+            },
+        )
+        submit = SubmitField("Submit")
+
     class EditTypeFloorForm(FlaskForm):
         submit = SubmitField("Set as Floor")
 

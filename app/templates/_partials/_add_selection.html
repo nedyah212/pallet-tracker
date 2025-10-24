@@ -1,0 +1,14 @@
+<section>
+  <div>
+    <strong><i>Batch Creation Tool</i></strong>
+  </div>
+  <div>
+    <form method="POST">
+      {{ form.csrf_token() }}
+      {{ form.selection(rows=10, cols=50) }}
+      <br>
+      <br>
+      {{ form.submit() }}
+    </form>
+  </div>
+</section>
