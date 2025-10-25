@@ -35,9 +35,24 @@ class Services:
         @staticmethod
         def batch_get_elements(raw_text, type="pallet"):
             text = Services.HelperMethods.filter_with_regex(raw_text, type)
+            text = "".join(text)
             elements = text.split(",")
             elements = [e for e in elements if e != ""]
             return elements
+
+        @staticmethod
+        def add_element(raw_text, type="pallet"):
+            elements = Services.HelperMethods.batch_get_elements(raw_text, type)
+            db_methods = Services.DatabaseMethods()
+            for element in elements:
+                invalid_element = db_methods.validate_element(element, type)
+                if not invalid_element:
+                    if type == "trailer":
+                        new_element = Trailer(id=element)
+                    else:
+                        new_element = Pallet(id=element)
+
+                    Services.DatabaseMethods.update(new_element)
 
     class ConstructorMethods:
         def create_shipment_object(form):
@@ -108,8 +123,10 @@ class Services:
                 logger.error(f"SQLAlchemyError: {e}")
             return shipment
 
+        @staticmethod
         def update(record):
             try:
+                db.session.add(record)
                 db.session.commit()
             except IntegrityError as e:
                 logger.error(f"IntegrityError: {e}")
@@ -138,15 +155,16 @@ class Services:
                 logger.error(f"SQLAlchemyError: {e}")
             return pallets
 
-        def validate_element(self, element):
+        def validate_element(self, element, type="pallet"):
             try:
-                if type(element) == Pallet:
-                    element = db.session.get(Pallet, element.id)
-                elif type(element) == Trailer:
-                    element = db.session.get(Trailer, element.id)
+                object = None
+                if type == "pallet":
+                    object = db.session.get(Pallet, element)
+                elif type == "trailer":
+                    object = db.session.get(Trailer, element)
 
             except OperationalError as e:
                 logger.error(f"OperationalError: {e}")
             except SQLAlchemyError as e:
                 logger.error(f"SQLAlchemyError: {e}")
-            return element
+            return object

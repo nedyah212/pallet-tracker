@@ -207,12 +207,30 @@ class TestCreateShipmentForm:
             db.session.commit()
 
             helper = Services.DatabaseMethods()
-            pallet1 = helper.validate_element(pallet)
-            pallet2 = helper.validate_element(Pallet(id="1002"))
-            trailer1 = helper.validate_element(trailer)
-            trailer2 = helper.validate_element(Trailer(id="T2002"))
+            pallet1 = helper.validate_element("1001")
+            pallet2 = helper.validate_element("1002")
+            trailer1 = helper.validate_element("T2000", "trailer")
+            trailer2 = helper.validate_element("T2002", "trailer")
 
             assert pallet1.id == pallet.id
             assert pallet2 is None
             assert trailer1.id == trailer.id
             assert trailer2 is None
+
+    def test_add_element(self, app):
+        """Test of functionality for add_element"""
+        with app.app_context():
+            elements = "1000,1001,1002"
+            pallet = Pallet(id="1000")
+            db.session.add(pallet)
+            db.session.commit()
+            Services.HelperMethods.add_element(elements, type="pallet")
+
+            assert len(db.session.query(Pallet).all()) == 3
+
+    def test_update(self, app):
+        """Test functionality of update"""
+        with app.app_context():
+            pallet = Pallet(id="1000")
+            Services.DatabaseMethods.update(pallet)
+            assert len(db.session.query(Pallet).all()) == 1
