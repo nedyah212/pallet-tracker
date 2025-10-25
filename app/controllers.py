@@ -1,5 +1,6 @@
 from .forms import Forms
 from .services import Services
+from .models import Trailer
 
 
 class Controller:
@@ -30,15 +31,20 @@ class Controller:
         }
 
     def type_trailer(registration_number):
+
+        items = Trailer.query.all()
+        form = Forms.EditTypeTrailerForm()
+        form.choice.choices = [(item.id, item.id) for item in items]
+
         Services.DatabaseMethods.get_shipment(registration_number)
         return {
-            "form": Forms.EditTypeTrailerForm(),
+            "form": form,
             "shipment": Services.DatabaseMethods.get_shipment(registration_number),
         }
 
     def settings():
         return {
-            "setting-form": Forms.EditSettingForm(),
+            "settings-form": Forms.EditSettingForm(),
             "batch-form": Forms.BatchEntryForm(),
         }
 

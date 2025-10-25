@@ -4,7 +4,7 @@ import tempfile
 import sys
 from app.forms import Forms
 from app.services import Services
-from wtforms import ValidationError
+from app.models import Pallet, Trailer
 
 sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), "..")))
 
@@ -66,6 +66,19 @@ class TestHelperMethods:
         assert helper.remove_delimiters("8136   0025-2025") == "813600252025"
         assert helper.remove_delimiters("8136/0025/2025") == "813600252025"
         assert helper.remove_delimiters(None) == ""
+
+    def test_filter_with_regex(self):
+        """Test filter with regex for functionality"""
+        helper = Services.HelperMethods()
+        assert helper.filter_with_regex("!%^*&$8 72d30874)*&(*^(&%)),") == "87230874,"
+        assert helper.filter_with_regex("(*^(&%^T55 92/,'[]k,", "trailer") == "T5592,k,"
+
+    def test_batch_elements(self):
+        """Test batch elements for functionality"""
+        helper = Services.HelperMethods()
+        assert len(helper.batch_get_elements("1006, %1002")) == 2
+        assert len(helper.batch_get_elements(",1006, %1002, ,")) == 2
+        assert len(helper.batch_get_elements("T204, T392, /X20", "trailer")) == 3
 
 
 class TestCreateShipmentForm:
@@ -183,3 +196,23 @@ class TestCreateShipmentForm:
                 "/create_shipment", data=form.data, follow_redirects=True
             )
             assert response.status_code == 200
+
+    def test_validate_element(self, app):
+        """Test of functionality for validate element"""
+        with app.app_context():
+            pallet = Pallet(id="1001")
+            trailer = Trailer(id="T2000")
+            db.session.add(pallet)
+            db.session.add(trailer)
+            db.session.commit()
+
+            helper = Services.DatabaseMethods()
+            pallet1 = helper.validate_element(pallet)
+            pallet2 = helper.validate_element(Pallet(id="1002"))
+            trailer1 = helper.validate_element(trailer)
+            trailer2 = helper.validate_element(Trailer(id="T2002"))
+
+            assert pallet1.id == pallet.id
+            assert pallet2 is None
+            assert trailer1.id == trailer.id
+            assert trailer2 is None

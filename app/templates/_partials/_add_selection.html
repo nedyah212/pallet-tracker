@@ -2,7 +2,7 @@
   <div>
     <form method="POST">
       {{ form.csrf_token() }}
-      {{ form.selection(rows=10, cols=50) }}
+      {{ form.choice }}
       <br>
       <br>
       {{ form.submit() }}

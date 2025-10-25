@@ -8,6 +8,7 @@ from wtforms import (
     BooleanField,
     DateTimeField,
     RadioField,
+    SelectField,
 )
 from wtforms.validators import DataRequired, Length, Optional, ValidationError
 from .models import Shipment
@@ -109,7 +110,7 @@ class Forms:
         submit = SubmitField("Submit")
 
     class BatchEntryForm(FlaskForm):
-        selection = TextAreaField(
+        choice = TextAreaField(
             "Pallets",
             validators=[DataRequired(message="Please enter pallet data")],
             render_kw={
@@ -124,4 +125,5 @@ class Forms:
         submit = SubmitField("Set as Floor")
 
     class EditTypeTrailerForm(FlaskForm):
-        submit = SubmitField("Set as Trailer")
+        choice = SelectField("Select an option", validators=[DataRequired()])
+        submit = SubmitField("Submit")

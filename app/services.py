@@ -2,6 +2,7 @@ from . import db
 from .logging import logger
 from sqlalchemy.exc import IntegrityError, OperationalError, SQLAlchemyError
 from .models import Shipment, Pallet, Trailer, OversizedGood
+import re
 
 
 class Services:
@@ -23,67 +24,20 @@ class Services:
                 else ""
             )
 
-    class DatabaseMethods:
-        def create_shipment(shipment):
-            try:
-                db.session.add(shipment)
-                db.session.commit()
-                logger.info(f"Success: {shipment} has been added to the database.")
-                return True
-            except IntegrityError as e:
-                logger.error(f"IntegrityError: {e}")
-                db.session.rollback()
-                return False
-            except OperationalError as e:
-                logger.error(f"OperationalError: {e}")
-                db.session.rollback()
-                return False
-            except SQLAlchemyError as e:
-                logger.error(f"SQLAlchemyError: {e}")
-                db.session.rollback()
-                return False
+        @staticmethod
+        def filter_with_regex(text, type="pallet"):
+            if type == "pallet":
+                text = re.sub(r"[^0-9,]", "", text)
+            elif type == "trailer":
+                text = re.sub(r"[^a-zA-Z0-9,]", "", text)
+            return text
 
-        def get_shipment(registration_number):
-            try:
-                shipment = Shipment.query.get(registration_number)
-                logger.info(
-                    f"Success: Database queried for shipment by registration number."
-                )
-            except OperationalError as e:
-                logger.error(f"OperationalError: {e}")
-            except SQLAlchemyError as e:
-                logger.error(f"SQLAlchemyError: {e}")
-            return shipment
-
-        def update(shipment):
-            try:
-                db.session.commit()
-            except IntegrityError as e:
-                logger.error(f"IntegrityError: {e}")
-                db.session.rollback()
-                return False
-            except OperationalError as e:
-                logger.error(f"OperationalError: {e}")
-                db.session.rollback()
-                return False
-            except SQLAlchemyError as e:
-                logger.error(f"SQLAlchemyError: {e}")
-                db.session.rollback()
-                return False
-
-        def get_pallets(registration_number):
-            try:
-                pallets = Pallet.query.filter_by(
-                    registration_number=registration_number
-                ).all()
-                logger.info(
-                    f"Success: Database queried for pallets by registration number."
-                )
-            except OperationalError as e:
-                logger.error(f"OperationalError: {e}")
-            except SQLAlchemyError as e:
-                logger.error(f"SQLAlchemyError: {e}")
-            return pallets
+        @staticmethod
+        def batch_get_elements(raw_text, type="pallet"):
+            text = Services.HelperMethods.filter_with_regex(raw_text, type)
+            elements = text.split(",")
+            elements = [e for e in elements if e != ""]
+            return elements
 
     class ConstructorMethods:
         def create_shipment_object(form):
@@ -121,3 +75,78 @@ class Services:
                 description=desc, location=loc, registration_number=reg
             )
             return oversized_good
+
+    class DatabaseMethods:
+        def create_shipment(shipment):
+            try:
+                db.session.add(shipment)
+                db.session.commit()
+                logger.info(f"Success: {shipment} has been added to the database.")
+                return True
+            except IntegrityError as e:
+                logger.error(f"IntegrityError: {e}")
+                db.session.rollback()
+                return False
+            except OperationalError as e:
+                logger.error(f"OperationalError: {e}")
+                db.session.rollback()
+                return False
+            except SQLAlchemyError as e:
+                logger.error(f"SQLAlchemyError: {e}")
+                db.session.rollback()
+                return False
+
+        def get_shipment(registration_number):
+            try:
+                shipment = Shipment.query.get(registration_number)
+                logger.info(
+                    f"Success: Database queried for shipment by registration number."
+                )
+            except OperationalError as e:
+                logger.error(f"OperationalError: {e}")
+            except SQLAlchemyError as e:
+                logger.error(f"SQLAlchemyError: {e}")
+            return shipment
+
+        def update(record):
+            try:
+                db.session.commit()
+            except IntegrityError as e:
+                logger.error(f"IntegrityError: {e}")
+                db.session.rollback()
+                return False
+            except OperationalError as e:
+                logger.error(f"OperationalError: {e}")
+                db.session.rollback()
+                return False
+            except SQLAlchemyError as e:
+                logger.error(f"SQLAlchemyError: {e}")
+                db.session.rollback()
+                return False
+
+        def get_pallets(registration_number):
+            try:
+                pallets = Pallet.query.filter_by(
+                    registration_number=registration_number
+                ).all()
+                logger.info(
+                    f"Success: Database queried for pallets by registration number."
+                )
+            except OperationalError as e:
+                logger.error(f"OperationalError: {e}")
+            except SQLAlchemyError as e:
+                logger.error(f"SQLAlchemyError: {e}")
+            return pallets
+
+        def validate_element(self, element):
+            try:
+                if type(element) == Pallet:
+                    element = db.session.get(Pallet, element.id)
+                elif type(element) == Trailer:
+                    element = db.session.get(Trailer, element.id)
+
+            except OperationalError as e:
+                logger.error(f"OperationalError: {e}")
+            except SQLAlchemyError as e:
+                logger.error(f"SQLAlchemyError: {e}")
+            return element

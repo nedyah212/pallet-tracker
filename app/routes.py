@@ -85,20 +85,21 @@ def type_pallet(registration_number):
 def type_trailer(registration_number):
     data = Controller.type_trailer(registration_number)
 
-    if data["form"].is_submitted():
+    if data["form"].validate_on_submit():
         ## implement once you have a dropdown for trailer_id on form
-        ##Controller.handle_move_to_trailer(registration_number, trailer_id)
         Controller.handle_move_to_trailer(registration_number=registration_number)
         return redirect(url_for("main.home"))
 
     return render_template(
-        "shipment/type_trailer.html", registration_number=registration_number
+        "shipment/type_trailer.html",
+        registration_number=registration_number,
+        form=data["form"],
     )
 
 
 @main.route("/settings", methods=["GET", "POST"])
 def settings():
-    form = Controller.settings()["setting-form"]
+    form = Controller.settings()["settings-form"]
     if form.validate_on_submit():
         return redirect(
             url_for(
