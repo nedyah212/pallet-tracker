@@ -1,4 +1,4 @@
-from flask import Blueprint, render_template, redirect, url_for
+from flask import Blueprint, render_template, redirect, url_for, flash, session
 from .controllers import Controller
 from .services import Services
 
@@ -58,6 +58,7 @@ def type_floor(registration_number):
 
     if data["form"].is_submitted():
         Controller.remove_pallet_or_trailer(data["shipment"], registration_number)
+        flash("TEST MESSAGE", "error")
         return redirect(url_for("main.home"))
 
     return render_template(
@@ -109,13 +110,21 @@ def settings():
     return render_template("settings/settings.html", form=form)
 
 
-@main.route("/settings/pallet")
+@main.route("/settings/pallet", methods=["GET", "POST"])
 def pallet():
-    data = Controller.settings()["batch-form"]
-    return render_template("settings/pallet.html", form=data)
+    form = Controller.settings()["batch-form"]
+    if form.validate_on_submit():
+        msg = Controller.add_element(form.choice.data)
+        if msg != "":
+            message, category = msg
+            flash(message, category)
+
+        return redirect(url_for("main.pallet"))
+
+    return render_template("settings/pallet.html", form=form)
 
 
 @main.route("/settings/trailer")
 def trailer():
-    data = Controller.settings()["batch-form"]
-    return render_template("settings/trailer.html", form=data)
+    form = Controller.settings()["batch-form"]
+    return render_template("settings/trailer.html", form=form)

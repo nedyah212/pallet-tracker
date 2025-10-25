@@ -1,5 +1,4 @@
 from . import db
-from flask import flash
 from .logging import logger
 from sqlalchemy.exc import IntegrityError, OperationalError, SQLAlchemyError
 from .models import Shipment, Pallet, Trailer, OversizedGood
@@ -40,29 +39,6 @@ class Services:
             elements = text.split(",")
             elements = [e for e in elements if e != ""]
             return elements
-
-        @staticmethod
-        def add_element(raw_text, type="pallet"):
-            elements = Services.HelperMethods.batch_get_elements(raw_text, type)
-            db_methods = Services.DatabaseMethods()
-            errors = []
-
-            for element in elements:
-                is_valid = db_methods.validate_element(element, type)
-
-                if not is_valid:
-                    errors.append((is_valid, element))
-
-            if not errors:
-                for element in elements:
-                    new_element = (
-                        Trailer(id=element) if type == "trailer" else Pallet(id=element)
-                    )
-                    Services.DatabaseMethods.update(new_element)
-            else:
-                invalid_ids = ",".join([element for _, element in errors])
-                flash(f"Failed to add {type}(s): {invalid_ids}", "error")
-                logger.warning(f"Failed to add {type}(s): {invalid_ids}")
 
     class ConstructorMethods:
         def create_shipment_object(form):

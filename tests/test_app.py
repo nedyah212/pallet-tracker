@@ -6,6 +6,7 @@ from app.forms import Forms
 from app.services import Services
 from app.models import Shipment, Pallet, Trailer
 from flask import get_flashed_messages
+from app.controllers import Controller
 
 sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), "..")))
 
@@ -80,6 +81,31 @@ class TestHelperMethods:
         assert len(helper.batch_get_elements("1006, %1002")) == 2
         assert len(helper.batch_get_elements(",1006, %1002, ,")) == 2
         assert len(helper.batch_get_elements("T204, T392, /X20", "trailer")) == 3
+
+    def test_add_element(self, app):
+        """Test of functionality for add_element"""
+
+        # FIRST SECTION - with PK violation
+        with app.test_request_context():
+            elements = "1000,1001,1002"
+            pallet = Pallet(id="1000")
+            db.session.add(pallet)
+            db.session.commit()
+
+            msg = Controller.add_element(elements, type="pallet")
+            message, category = msg
+            assert message == "Failed to add pallet(s): 1000"
+            assert len(db.session.query(Pallet).all()) == 1
+
+        # SECOND SECTION - successful add
+        with app.test_request_context():
+            db.session.query(Pallet).delete()
+            db.session.commit()
+            assert len(db.session.query(Pallet).all()) == 0
+
+            msg = Controller.add_element(elements, type="pallet")
+            assert msg == ""
+            assert len(db.session.query(Pallet).all()) == 3
 
 
 class TestCreateShipmentForm:
@@ -174,10 +200,6 @@ class TestCreateShipmentForm:
             )
             assert not form.validate()
 
-
-class TestDatabaseMethods:
-    """Test functionality of DatabaseMethods"""
-
     def test_form_submit(self, app, client):
         """Test Post, And For PK Violations"""
         with app.app_context():
@@ -203,6 +225,10 @@ class TestDatabaseMethods:
             )
             assert response.status_code == 200
 
+
+class TestDatabaseMethods:
+    """Test functionality of DatabaseMethods"""
+
     def test_validate_element(self, app):
         """Test of functionality for validate element"""
         with app.app_context():
@@ -222,36 +248,6 @@ class TestDatabaseMethods:
             assert pallet2 is True
             assert trailer1 is False
             assert trailer2 is True
-
-    def test_add_element(self, app):
-        """Test of functionality for add_element"""
-
-        # FIRST SECTION - with PK violation
-        with app.test_request_context():
-            elements = "1000,1001,1002"
-            pallet = Pallet(id="1000")
-            db.session.add(pallet)
-            db.session.commit()
-
-            Services.HelperMethods.add_element(elements, type="pallet")
-            messages = get_flashed_messages(with_categories=True)
-
-            assert len(db.session.query(Pallet).all()) == 1
-            assert len(messages) == 1
-            assert messages[0][0] == "error"
-            assert "1000" in messages[0][1]
-
-        # SECOND SECTION - successful add
-        with app.test_request_context():
-            db.session.query(Pallet).delete()
-            db.session.commit()
-            assert len(db.session.query(Pallet).all()) == 0
-
-            Services.HelperMethods.add_element(elements, type="pallet")
-            messages = get_flashed_messages(with_categories=True)
-
-            assert len(db.session.query(Pallet).all()) == 3
-            assert len(messages) == 0
 
     def test_update(self, app):
         """Test functionality of update"""
