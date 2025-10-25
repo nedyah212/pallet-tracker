@@ -1,4 +1,5 @@
 from . import db
+from flask import flash
 from .logging import logger
 from sqlalchemy.exc import IntegrityError, OperationalError, SQLAlchemyError
 from .models import Shipment, Pallet, Trailer, OversizedGood
@@ -44,15 +45,24 @@ class Services:
         def add_element(raw_text, type="pallet"):
             elements = Services.HelperMethods.batch_get_elements(raw_text, type)
             db_methods = Services.DatabaseMethods()
-            for element in elements:
-                invalid_element = db_methods.validate_element(element, type)
-                if not invalid_element:
-                    if type == "trailer":
-                        new_element = Trailer(id=element)
-                    else:
-                        new_element = Pallet(id=element)
+            errors = []
 
+            for element in elements:
+                is_valid = db_methods.validate_element(element, type)
+
+                if not is_valid:
+                    errors.append((is_valid, element))
+
+            if not errors:
+                for element in elements:
+                    new_element = (
+                        Trailer(id=element) if type == "trailer" else Pallet(id=element)
+                    )
                     Services.DatabaseMethods.update(new_element)
+            else:
+                invalid_ids = ",".join([element for _, element in errors])
+                flash(f"Failed to add {type}(s): {invalid_ids}", "error")
+                logger.warning(f"Failed to add {type}(s): {invalid_ids}")
 
     class ConstructorMethods:
         def create_shipment_object(form):
@@ -72,18 +82,6 @@ class Services:
                 checked_out_by=form.checked_out_by.data,
             )
             return shipment
-
-        def create_pallet_object(form, registration_number):
-            pallet = Pallet(
-                id=form.id.data,
-                row=form.row.data or None,
-                registration_number=registration_number,
-            )
-            return pallet
-
-        def create_trailer_object(form, trailer_id):
-            trailer = Trailer(id=trailer_id, status=form.id.data)
-            return trailer
 
         def create_oversized_good(form, desc, loc, reg):
             oversized_good = OversizedGood(
@@ -113,7 +111,7 @@ class Services:
 
         def get_shipment(registration_number):
             try:
-                shipment = Shipment.query.get(registration_number)
+                shipment = db.session.get(Shipment, registration_number)
                 logger.info(
                     f"Success: Database queried for shipment by registration number."
                 )
@@ -157,14 +155,14 @@ class Services:
 
         def validate_element(self, element, type="pallet"):
             try:
-                object = None
-                if type == "pallet":
-                    object = db.session.get(Pallet, element)
-                elif type == "trailer":
-                    object = db.session.get(Trailer, element)
+                if type == "trailer":
+                    record = db.session.get(Trailer, element)
+                else:
+                    record = db.session.get(Pallet, element)
 
+                record = False if record != None else True
             except OperationalError as e:
                 logger.error(f"OperationalError: {e}")
             except SQLAlchemyError as e:
                 logger.error(f"SQLAlchemyError: {e}")
-            return object
+            return record

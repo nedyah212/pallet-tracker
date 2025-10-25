@@ -4,7 +4,8 @@ import tempfile
 import sys
 from app.forms import Forms
 from app.services import Services
-from app.models import Pallet, Trailer
+from app.models import Shipment, Pallet, Trailer
+from flask import get_flashed_messages
 
 sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), "..")))
 
@@ -71,7 +72,7 @@ class TestHelperMethods:
         """Test filter with regex for functionality"""
         helper = Services.HelperMethods()
         assert helper.filter_with_regex("!%^*&$8 72d30874)*&(*^(&%)),") == "87230874,"
-        assert helper.filter_with_regex("(*^(&%^T55 92/,'[]k,", "trailer") == "T5592,k,"
+        assert helper.filter_with_regex("(*^&%^T55 92/,'[]k,", "trailer") == "T5592,k,"
 
     def test_batch_elements(self):
         """Test batch elements for functionality"""
@@ -130,6 +131,7 @@ class TestCreateShipmentForm:
 
     def test_form_requirements(self, app):
         """Test Non PK Field That Is Required"""
+
         with app.app_context():
             form = Forms.CreateShipmentForm(
                 data={
@@ -172,6 +174,10 @@ class TestCreateShipmentForm:
             )
             assert not form.validate()
 
+
+class TestDatabaseMethods:
+    """Test functionality of DatabaseMethods"""
+
     def test_form_submit(self, app, client):
         """Test Post, And For PK Violations"""
         with app.app_context():
@@ -212,21 +218,40 @@ class TestCreateShipmentForm:
             trailer1 = helper.validate_element("T2000", "trailer")
             trailer2 = helper.validate_element("T2002", "trailer")
 
-            assert pallet1.id == pallet.id
-            assert pallet2 is None
-            assert trailer1.id == trailer.id
-            assert trailer2 is None
+            assert pallet1 is False
+            assert pallet2 is True
+            assert trailer1 is False
+            assert trailer2 is True
 
     def test_add_element(self, app):
         """Test of functionality for add_element"""
-        with app.app_context():
+
+        # FIRST SECTION - with PK violation
+        with app.test_request_context():
             elements = "1000,1001,1002"
             pallet = Pallet(id="1000")
             db.session.add(pallet)
             db.session.commit()
+
             Services.HelperMethods.add_element(elements, type="pallet")
+            messages = get_flashed_messages(with_categories=True)
+
+            assert len(db.session.query(Pallet).all()) == 1
+            assert len(messages) == 1
+            assert messages[0][0] == "error"
+            assert "1000" in messages[0][1]
+
+        # SECOND SECTION - successful add
+        with app.test_request_context():
+            db.session.query(Pallet).delete()
+            db.session.commit()
+            assert len(db.session.query(Pallet).all()) == 0
+
+            Services.HelperMethods.add_element(elements, type="pallet")
+            messages = get_flashed_messages(with_categories=True)
 
             assert len(db.session.query(Pallet).all()) == 3
+            assert len(messages) == 0
 
     def test_update(self, app):
         """Test functionality of update"""
@@ -234,3 +259,13 @@ class TestCreateShipmentForm:
             pallet = Pallet(id="1000")
             Services.DatabaseMethods.update(pallet)
             assert len(db.session.query(Pallet).all()) == 1
+
+    def test_get_shipment(self, app):
+        """Test functionality of update"""
+        with app.app_context():
+            id = "8132025"
+            shipment = Shipment(registration_number=id, first_name="1", last_name="2")
+            db.session.add(shipment)
+            db.session.commit()
+
+            assert Services.DatabaseMethods.get_shipment(id) == shipment
