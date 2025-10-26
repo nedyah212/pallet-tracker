@@ -24,7 +24,7 @@ def create_shipment():
             flash(
                 "Failed to create shipment, "
                 + f"{form.registration_number.data}"
-                + " already in the system",
+                + " shipment already in the system",
                 "error",
             )
 
@@ -33,7 +33,9 @@ def create_shipment():
             success = Services.DatabaseMethods.create_shipment(shipment)
             if success:
                 flash(
-                    f"Success, {shipment.registration_number} added to system.",
+                    f"Success, Shipment "
+                    + f"{shipment.registration_number} "
+                    + "added to system.",
                     "success",
                 )
                 return redirect(
