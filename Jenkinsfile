@@ -26,7 +26,6 @@ pipeline {
         stage('Run Unit Tests') {
             steps {
                 sh '''
-                    export $(cat .env | xargs)
                     python3 -m venv venv
                     . venv/bin/activate
                     pip install -r requirements.txt

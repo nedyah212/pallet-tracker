@@ -5,7 +5,6 @@ import sys
 from app.forms import Forms
 from app.services import Services
 from app.models import Shipment, Pallet, Trailer
-from flask import get_flashed_messages
 from app.controllers import Controller
 
 sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), "..")))
@@ -22,6 +21,7 @@ def app():
     test_app.config["SQLALCHEMY_DATABASE_URI"] = "sqlite:///:memory:"
     test_app.config["TESTING"] = True
     test_app.config["WTF_CSRF_ENABLED"] = False
+    test_app.config["SECRET_KEY"] = "test-secret-key-for-testing"
 
     with test_app.app_context():
         db.create_all()
