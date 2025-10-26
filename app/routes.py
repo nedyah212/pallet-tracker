@@ -19,7 +19,7 @@ def create_shipment():
         existing = Shipment.query.filter_by(
             registration_number=form.registration_number.data
         ).first()
-
+        print(existing)
         if existing:
             flash(
                 "Failed to create shipment, "
