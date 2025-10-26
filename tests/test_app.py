@@ -94,7 +94,7 @@ class TestHelperMethods:
 
             msg = Controller.add_element(elements, type="pallet")
             message, category = msg
-            assert message == "Failed to add pallet(s): 1000"
+            assert message == "Failed to add pallet: 1000"
             assert len(db.session.query(Pallet).all()) == 1
 
         # SECOND SECTION - successful add
@@ -105,7 +105,7 @@ class TestHelperMethods:
 
             msg = Controller.add_element(elements, type="pallet")
             message, category = msg
-            assert message == "Success, added pallet(s): 1000,1001,1002"
+            assert message == "Success, added pallet: 1000, 1001, 1002"
             assert len(db.session.query(Pallet).all()) == 3
 
 

@@ -112,12 +112,12 @@ class Controller:
                     Trailer(id=element) if type == "trailer" else Pallet(id=element)
                 )
                 Services.DatabaseMethods.update(new_element)
-            valid_ids = ",".join([element for _, element in successes])
-            flash = f"Success, added {type}(s): {valid_ids}", "success"
-            logger.warning(f"Success, added {type}(s): {valid_ids}")
+            valid_ids = ", ".join([element for _, element in successes])
+            flash = f"Success, added {type}: {valid_ids}", "success"
+            logger.warning(f"Success, added {type}: {valid_ids}")
         else:
-            invalid_ids = ",".join([element for _, element in errors])
-            flash = f"Failed to add {type}(s): {invalid_ids}", "error"
-            logger.warning(f"Failed to add {type}(s): {invalid_ids}")
+            invalid_ids = ", ".join([element for _, element in errors])
+            flash = f"Failed to add {type}: {invalid_ids}", "error"
+            logger.warning(f"Failed to add {type}: {invalid_ids}")
 
         return flash

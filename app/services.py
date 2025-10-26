@@ -9,7 +9,8 @@ class Services:
 
     class HelperMethods:
 
-        def boolean_to_status_string(self, boolean):
+        @staticmethod
+        def boolean_to_status_string(boolean):
             return (
                 "At Capacity"
                 if boolean
@@ -97,7 +98,6 @@ class Services:
                 logger.error(f"SQLAlchemyError: {e}")
             return shipment
 
-        @staticmethod
         def update(record):
             try:
                 db.session.add(record)

@@ -1,6 +1,7 @@
 from flask import Blueprint, render_template, redirect, url_for, flash, session
 from .controllers import Controller
 from .services import Services
+from .models import Shipment
 
 main = Blueprint("main", __name__)
 
@@ -15,16 +16,32 @@ def create_shipment():
     form = Controller.create_shipment()
 
     if form.validate_on_submit():
-        shipment = Services.ConstructorMethods.create_shipment_object(form)
-        success = Services.DatabaseMethods.create_shipment(shipment)
+        existing = Shipment.query.filter_by(
+            registration_number=form.registration_number.data
+        ).first()
 
-        if success:
-            return redirect(
-                url_for(
-                    "main.edit_type", registration_number=shipment.registration_number
-                )
+        if existing:
+            flash(
+                "Failed to create shipment, "
+                + f"{form.registration_number.data}"
+                + " already in the system",
+                "error",
             )
 
+        else:
+            shipment = Services.ConstructorMethods.create_shipment_object(form)
+            success = Services.DatabaseMethods.create_shipment(shipment)
+            if success:
+                flash(
+                    f"Success, {shipment.registration_number} added to system.",
+                    "success",
+                )
+                return redirect(
+                    url_for(
+                        "main.edit_type",
+                        registration_number=shipment.registration_number,
+                    )
+                )
     return render_template("shipment/create.html", form=form)
 
 
@@ -58,7 +75,6 @@ def type_floor(registration_number):
 
     if data["form"].is_submitted():
         Controller.remove_pallet_or_trailer(data["shipment"], registration_number)
-        flash("TEST MESSAGE", "error")
         return redirect(url_for("main.home"))
 
     return render_template(
@@ -124,11 +140,11 @@ def pallet():
     return render_template("settings/pallet.html", form=form)
 
 
-@main.route("/settings/trailer")
+@main.route("/settings/trailer", methods=["GET", "POST"])
 def trailer():
     form = Controller.settings()["batch-form"]
     if form.validate_on_submit():
-        msg = Controller.add_element(form.choice.data)
+        msg = Controller.add_element(form.choice.data, "trailer")
         if msg != "":
             message, category = msg
             flash(message, category)
