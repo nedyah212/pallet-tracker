@@ -127,4 +127,12 @@ def pallet():
 @main.route("/settings/trailer")
 def trailer():
     form = Controller.settings()["batch-form"]
+    if form.validate_on_submit():
+        msg = Controller.add_element(form.choice.data)
+        if msg != "":
+            message, category = msg
+            flash(message, category)
+
+        return redirect(url_for("main.trailer"))
+
     return render_template("settings/trailer.html", form=form)

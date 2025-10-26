@@ -95,9 +95,13 @@ class Controller:
         elements = Services.HelperMethods.batch_get_elements(raw_text, type)
         db_methods = Services.DatabaseMethods()
         errors = []
+        successes = []
         flash = ""
         for element in elements:
             is_valid = db_methods.validate_element(element, type)
+
+            if is_valid:
+                successes.append((is_valid, element))
 
             if not is_valid:
                 errors.append((is_valid, element))
@@ -108,6 +112,9 @@ class Controller:
                     Trailer(id=element) if type == "trailer" else Pallet(id=element)
                 )
                 Services.DatabaseMethods.update(new_element)
+            valid_ids = ",".join([element for _, element in successes])
+            flash = f"Success, added {type}(s): {valid_ids}", "success"
+            logger.warning(f"Success, added {type}(s): {valid_ids}")
         else:
             invalid_ids = ",".join([element for _, element in errors])
             flash = f"Failed to add {type}(s): {invalid_ids}", "error"

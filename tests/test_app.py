@@ -84,7 +84,7 @@ class TestHelperMethods:
 
     def test_add_element(self, app):
         """Test of functionality for add_element"""
-
+        # Pallet
         # FIRST SECTION - with PK violation
         with app.test_request_context():
             elements = "1000,1001,1002"
@@ -104,7 +104,8 @@ class TestHelperMethods:
             assert len(db.session.query(Pallet).all()) == 0
 
             msg = Controller.add_element(elements, type="pallet")
-            assert msg == ""
+            message, category = msg
+            assert message == "Success, added pallet(s): 1000,1001,1002"
             assert len(db.session.query(Pallet).all()) == 3
 
 
