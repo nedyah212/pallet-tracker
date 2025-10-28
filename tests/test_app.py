@@ -81,6 +81,7 @@ class TestHelperMethods:
         assert len(helper.batch_get_elements("1006, %1002")) == 2
         assert len(helper.batch_get_elements(",1006, %1002, ,")) == 2
         assert len(helper.batch_get_elements("T204, T392, /X20", "trailer")) == 3
+        assert len(helper.batch_get_elements("", "")) == 0
 
     def test_add_element(self, app):
         """Test of functionality for add_element"""
@@ -242,11 +243,15 @@ class TestDatabaseMethods:
             helper = Services.DatabaseMethods()
             pallet1 = helper.validate_element("1001")
             pallet2 = helper.validate_element("1002")
+            pallet3 = helper.validate_element("111")
+            pallet4 = helper.validate_element("11111")
             trailer1 = helper.validate_element("T2000", "trailer")
-            trailer2 = helper.validate_element("T2002", "trailer")
+            trailer2 = helper.validate_element("T20", "trailer")
 
             assert pallet1 is False
             assert pallet2 is True
+            assert pallet3 is None
+            assert pallet4 is None
             assert trailer1 is False
             assert trailer2 is True
 

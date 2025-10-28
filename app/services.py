@@ -38,7 +38,7 @@ class Services:
             text = Services.HelperMethods.filter_with_regex(raw_text, type)
             text = "".join(text)
             elements = text.split(",")
-            elements = [e for e in elements if e != ""]
+            elements = [e for e in elements if e.strip()]
             return elements
 
     class ConstructorMethods:
@@ -134,7 +134,10 @@ class Services:
                 if type == "trailer":
                     record = db.session.get(Trailer, element)
                 else:
-                    record = db.session.get(Pallet, element)
+                    if len(element) != 4:
+                        return None
+                    else:
+                        record = db.session.get(Pallet, element)
 
                 record = False if record != None else True
             except OperationalError as e:

@@ -103,10 +103,10 @@ class Controller:
             if is_valid:
                 successes.append((is_valid, element))
 
-            if not is_valid:
+            elif not is_valid:
                 errors.append((is_valid, element))
 
-        if not errors:
+        if not errors and successes:
             for element in elements:
                 new_element = (
                     Trailer(id=element) if type == "trailer" else Pallet(id=element)
@@ -115,6 +115,7 @@ class Controller:
             valid_ids = ", ".join([element for _, element in successes])
             flash = f"Success, added {type}: {valid_ids}", "success"
             logger.warning(f"Success, added {type}: {valid_ids}")
+
         else:
             invalid_ids = ", ".join([element for _, element in errors])
             flash = f"Failed to add {type}: {invalid_ids}", "error"
