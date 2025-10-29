@@ -72,42 +72,57 @@ class TestHelperMethods:
     def test_filter_with_regex(self):
         """Test filter with regex for functionality"""
         helper = Services.HelperMethods()
-        assert helper.filter_with_regex("!%^*&$8 72d30874)*&(*^(&%)),") == "87230874,"
-        assert helper.filter_with_regex("(*^&%^T55 92/,'[]k,", "trailer") == "T5592,k,"
+        assert (
+            helper.filter_with_regex("!%^*&$8 72d30874)*&(*^(&%)),", Pallet)
+            == "87230874,"
+        )
+        assert helper.filter_with_regex("(*^&%^T55 92/,'[]k,", Trailer) == "T5592,k,"
 
-    def test_batch_elements(self):
-        """Test batch elements for functionality"""
+    def test_mark_invalid_data(self):
+        """Test functionality mark invalid data"""
         helper = Services.HelperMethods()
-        assert len(helper.batch_get_elements("1006, %1002")) == 2
-        assert len(helper.batch_get_elements(",1006, %1002, ,")) == 2
-        assert len(helper.batch_get_elements("T204, T392, /X20", "trailer")) == 3
-        assert len(helper.batch_get_elements("", "")) == 0
+        # Pallet
+        # Valid data
+        assert helper.mark_invalid_data("1000", Pallet) == True
+        # Invalid data through length min
+        assert helper.mark_invalid_data("199", Pallet) == False
+        # Invalid data through length max
+        assert helper.mark_invalid_data("10001", Pallet) == False
+
+        # Trailer
+        # Valid data
+        assert helper.mark_invalid_data("T3", Trailer) == True
+        # Invalid data through min length
+        assert helper.mark_invalid_data("T", Trailer) == False
+
+        def test_add_element_validator(self, app):
+            """Test functionality of add element validator"""
+            helper = Services.HelperMethods()
+
+            with app.app_context():
+                # Test valid pallet (doesn't exist yet)
+                records = []
+                record = helper.add_element_validator(records, "5444", Pallet)
+                assert record == [("5444", True)]
+
+                # Test invalid pallet (already exists)
+                records = []
+                pallet = Pallet(id="1000")
+                db.session.add(pallet)
+                db.session.commit()
+                record = helper.add_element_validator(records, "1000", Pallet)
+                assert record == [("1000", False)]
+
+                # Test invalid format
+                records = []
+                record = helper.add_element_validator(records, "100", Pallet)
+                assert record == [("100", False)]
 
     def test_add_element(self, app):
-        """Test of functionality for add_element"""
-        # Pallet
-        # FIRST SECTION - with PK violation
-        with app.test_request_context():
-            elements = "1000,1001,1002"
-            pallet = Pallet(id="1000")
-            db.session.add(pallet)
-            db.session.commit()
-
-            msg = Controller.add_element(elements, type="pallet")
-            message, category = msg
-            assert message == "Failed to add pallet: 1000"
-            assert len(db.session.query(Pallet).all()) == 1
-
-        # SECOND SECTION - successful add
-        with app.test_request_context():
-            db.session.query(Pallet).delete()
-            db.session.commit()
-            assert len(db.session.query(Pallet).all()) == 0
-
-            msg = Controller.add_element(elements, type="pallet")
-            message, category = msg
-            assert message == "Success, added pallet: 1000, 1001, 1002"
-            assert len(db.session.query(Pallet).all()) == 3
+        """Test functionality of add element"""
+        with app.app_context():
+            msg, category = Controller.add_element("1001", Pallet)
+            assert msg == "Valid Pallet: 1001"
 
 
 class TestCreateShipmentForm:
@@ -229,32 +244,6 @@ class TestCreateShipmentForm:
 
 
 class TestDatabaseMethods:
-    """Test functionality of DatabaseMethods"""
-
-    def test_validate_element(self, app):
-        """Test of functionality for validate element"""
-        with app.app_context():
-            pallet = Pallet(id="1001")
-            trailer = Trailer(id="T2000")
-            db.session.add(pallet)
-            db.session.add(trailer)
-            db.session.commit()
-
-            helper = Services.DatabaseMethods()
-            pallet1 = helper.validate_element("1001")
-            pallet2 = helper.validate_element("1002")
-            pallet3 = helper.validate_element("111")
-            pallet4 = helper.validate_element("11111")
-            trailer1 = helper.validate_element("T2000", "trailer")
-            trailer2 = helper.validate_element("T20", "trailer")
-
-            assert pallet1 is False
-            assert pallet2 is True
-            assert pallet3 is None
-            assert pallet4 is None
-            assert trailer1 is False
-            assert trailer2 is True
-
     def test_update(self, app):
         """Test functionality of update"""
         with app.app_context():
@@ -263,7 +252,7 @@ class TestDatabaseMethods:
             assert len(db.session.query(Pallet).all()) == 1
 
     def test_get_shipment(self, app):
-        """Test functionality of update"""
+        """Test functionality of get shipment"""
         with app.app_context():
             id = "8132025"
             shipment = Shipment(registration_number=id, first_name="1", last_name="2")
@@ -271,3 +260,14 @@ class TestDatabaseMethods:
             db.session.commit()
 
             assert Services.DatabaseMethods.get_shipment(id) == shipment
+
+    def mark_invalid_pk(self, app):
+        """Test functionality of mark invlalid pk"""
+        with app.app_context():
+            helper = Services.DatabaseMethods()
+            assert helper.mark_invalid_pk("1001", Pallet) == True
+            assert helper.mark_invalid_pk("100", Pallet) == False
+            assert helper.mark_invalid_pk("", Pallet) == False
+            assert helper.mark_invalid_pk("T100", Trailer) == True
+            assert helper.mark_invalid_pk("T", Trailer) == False
+            assert helper.mark_invalid_pk("", Pallet) == False

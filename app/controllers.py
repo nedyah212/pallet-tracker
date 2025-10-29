@@ -91,34 +91,24 @@ class Controller:
         pass
 
     @staticmethod
-    def add_element(raw_text, type="pallet"):
-        elements = Services.HelperMethods.batch_get_elements(raw_text, type)
-        db_methods = Services.DatabaseMethods()
-        errors = []
-        successes = []
-        flash = ""
-        for element in elements:
-            is_valid = db_methods.validate_element(element, type)
+    def add_element(elements, elementT):
+        records = []
+        for element in elements.split(","):
+            element = element.strip()  # Remove whitespace
+            print(f"Processing: '{element}'")
+            records = Services.HelperMethods.add_element_validator(
+                records, element, elementT
+            )
+            print(f"Records so far: {records}")
 
-            if is_valid:
-                successes.append((is_valid, element))
+        valid = [el for el, is_valid in records if is_valid]
+        invalid = [el for el, is_valid in records if not is_valid]
 
-            elif not is_valid:
-                errors.append((is_valid, element))
-
-        if not errors and successes:
-            for element in elements:
-                new_element = (
-                    Trailer(id=element) if type == "trailer" else Pallet(id=element)
-                )
-                Services.DatabaseMethods.update(new_element)
-            valid_ids = ", ".join([element for _, element in successes])
-            flash = f"Success, added {type}: {valid_ids}", "success"
-            logger.warning(f"Success, added {type}: {valid_ids}")
-
+        if invalid:
+            msg = f"Invalid {elementT.__name__}: {', '.join(invalid)}"
+            category = "error"
         else:
-            invalid_ids = ", ".join([element for _, element in errors])
-            flash = f"Failed to add {type}: {invalid_ids}", "error"
-            logger.warning(f"Failed to add {type}: {invalid_ids}")
+            msg = f"Valid {elementT.__name__}: {', '.join(valid)}"
+            category = "success"
 
-        return flash
+        return msg, category

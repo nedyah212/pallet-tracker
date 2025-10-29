@@ -26,20 +26,36 @@ class Services:
             )
 
         @staticmethod
-        def filter_with_regex(text, type="pallet"):
-            if type == "pallet":
+        def filter_with_regex(text, data_type):
+            if data_type == Pallet:
                 text = re.sub(r"[^0-9,]", "", text)
-            elif type == "trailer":
+            elif data_type == Trailer:
                 text = re.sub(r"[^a-zA-Z0-9,]", "", text)
+                text.capitalize()
             return text
 
         @staticmethod
-        def batch_get_elements(raw_text, type="pallet"):
-            text = Services.HelperMethods.filter_with_regex(raw_text, type)
-            text = "".join(text)
-            elements = text.split(",")
-            elements = [e for e in elements if e.strip()]
-            return elements
+        def mark_invalid_data(text, data_type):
+            is_valid = False
+            if data_type == Pallet:
+                if len(text) == 4:
+                    is_valid = True
+
+            elif data_type == Trailer:
+                if len(text) >= 2:
+                    is_valid = True
+
+            return is_valid
+
+        @staticmethod
+        def add_element_validator(records, element, elementT):
+            element = Services.HelperMethods.filter_with_regex(element, elementT)
+            is_valid = Services.HelperMethods.mark_invalid_data(element, elementT)
+            is_valid = is_valid and Services.DatabaseMethods.mark_invalid_pk(
+                element, elementT
+            )
+            records.append((element, is_valid))
+            return records
 
     class ConstructorMethods:
         def create_shipment_object(form):
@@ -129,19 +145,13 @@ class Services:
                 logger.error(f"SQLAlchemyError: {e}")
             return pallets
 
-        def validate_element(self, element, type="pallet"):
+        def mark_invalid_pk(element, elementT):
             try:
-                if type == "trailer":
-                    record = db.session.get(Trailer, element)
-                else:
-                    if len(element) != 4:
-                        return None
-                    else:
-                        record = db.session.get(Pallet, element)
-
-                record = False if record != None else True
+                object = db.session.get(elementT, element)
+                return True if not object else False
             except OperationalError as e:
                 logger.error(f"OperationalError: {e}")
+                return False
             except SQLAlchemyError as e:
                 logger.error(f"SQLAlchemyError: {e}")
-            return record
+                return False

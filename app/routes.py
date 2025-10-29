@@ -1,7 +1,7 @@
 from flask import Blueprint, render_template, redirect, url_for, flash, session
 from .controllers import Controller
 from .services import Services
-from .models import Shipment
+from .models import Shipment, Trailer, Pallet
 
 main = Blueprint("main", __name__)
 
@@ -132,11 +132,10 @@ def settings():
 def pallet():
     form = Controller.settings()["batch-form"]
     if form.validate_on_submit():
-        msg = Controller.add_element(form.choice.data)
+        msg = Controller.add_element(form.choice.data, Pallet)
         if msg != "":
             message, category = msg
             flash(message, category)
-
         return redirect(url_for("main.pallet"))
 
     return render_template("settings/pallet.html", form=form)
@@ -146,7 +145,7 @@ def pallet():
 def trailer():
     form = Controller.settings()["batch-form"]
     if form.validate_on_submit():
-        msg = Controller.add_element(form.choice.data, "trailer")
+        msg = Controller.add_element(form.choice.data, Trailer)
         if msg != "":
             message, category = msg
             flash(message, category)
