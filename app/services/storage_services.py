@@ -5,6 +5,7 @@ import re
 
 class StorageServices:
 
+    @staticmethod
     def create_shipment_object(form):
         shipment = Shipment(
             registration_number=form.registration_number.data,
@@ -23,6 +24,7 @@ class StorageServices:
         )
         return shipment
 
+    @staticmethod
     def create_oversized_good(form, desc, loc, reg):
         oversized_good = OversizedGood(
             description=desc, location=loc, registration_number=reg

@@ -14,8 +14,8 @@ def home():
 
 @core_bp.route("/create_shipment", methods=["GET", "POST"])
 def create_shipment():
-    form = ShipmentsController.create_shipment()
-
+    controller = ShipmentsController()
+    form = controller.create_shipment()
     if form.validate_on_submit():
         existing = Shipment.query.filter_by(
             registration_number=form.registration_number.data
@@ -56,7 +56,8 @@ def show_shipment(registration_number):
 
 @core_bp.route("/edit_type/<registration_number>", methods=["GET", "POST"])
 def edit_type(registration_number):
-    form = ShipmentsController.edit_shipment()
+    controller = ShipmentsController()
+    form = controller.edit_shipment()
 
     if form.validate_on_submit():
 
@@ -82,7 +83,8 @@ def edit_type(registration_number):
 
 @core_bp.route("/edit_type/<registration_number>/floor", methods=["GET", "POST"])
 def type_floor(registration_number):
-    data = ShipmentsController.type_floor(registration_number)
+    controller = ShipmentsController()
+    data = controller.type_floor(registration_number)
 
     if data["form"].is_submitted():
         # Controller.remove_pallet_or_trailer(data["shipment"], registration_number)
@@ -95,7 +97,8 @@ def type_floor(registration_number):
 
 @core_bp.route("/edit_type/<registration_number>/pallet", methods=["GET", "POST"])
 def type_pallet(registration_number):
-    data = ShipmentsController.type_pallet(registration_number)
+    controller = ShipmentsController()
+    data = controller.type_floor(registration_number)
 
     if data["form"].is_submitted():
         # Controller.remove_pallet_or_trailer(shipment=data["shipment"])
@@ -111,7 +114,8 @@ def type_pallet(registration_number):
 
 @core_bp.route("/edit_type/<registration_number>/trailer", methods=["GET", "POST"])
 def type_trailer(registration_number):
-    data = ShipmentsController.type_trailer(registration_number)
+    controller = ShipmentsController
+    data = controller.type_trailer(registration_number)
 
     if data["form"].validate_on_submit():
         ## implement once you have a dropdown for trailer_id on form
@@ -123,17 +127,3 @@ def type_trailer(registration_number):
         registration_number=registration_number,
         form=data["form"],
     )
-
-
-@staticmethod
-def handle_choice(choice):
-    if choice == "floor":
-        route = "core_bp.type_floor"
-    elif choice == "pallet":
-        route = "core_bp.type_pallet"
-    elif choice == "trailer":
-        route = "core_bp.type_trailer"
-    else:
-        route = None
-
-    return route

@@ -11,44 +11,39 @@ from app.repositories import ShipmentRepository
 
 
 class ShipmentsController:
+    def __init__(self, shipment_repo=None):
+        self.shipment_repo = shipment_repo or ShipmentRepository()
 
-    @staticmethod
-    def home():
+    def home(self):
         return "pass"
 
-    @staticmethod
-    def create_shipment():
+    def create_shipment(self):
         return CreateShipmentForm()
 
-    @staticmethod
-    def show_shipment():
+    def show_shipment(self):
         return "pass"
 
-    @staticmethod
-    def edit_shipment():
+    def edit_shipment(self):
         return EditTypeForm()
 
-    @staticmethod
-    def type_floor(registration_number):
+    def type_floor(self, registration_number):
         return {
             "form": EditTypeFloorForm(),
-            "shipment": ShipmentRepository.get_shipment(registration_number),
+            "shipment": self.shipment_repo.get_shipment(registration_number),
         }
 
-    @staticmethod
-    def type_pallet(registration_number):
+    def type_pallet(self, registration_number):
         return {
             "form": BatchEntryForm(),
-            "shipment": ShipmentRepository.get_shipment(registration_number),
+            "shipment": self.shipment_repo.get_shipment(registration_number),
         }
 
-    @staticmethod
-    def type_trailer(registration_number):
+    def type_trailer(self, registration_number):
         items = Trailer.query.all()
         form = EditTypeTrailerForm()
         form.choice.choices = [(item.id, item.id) for item in items]
 
         return {
             "form": form,
-            "shipment": ShipmentRepository.get_shipment(registration_number),
+            "shipment": self.shipment_repo.get_shipment(registration_number),
         }
