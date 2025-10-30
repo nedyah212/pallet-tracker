@@ -1,7 +1,8 @@
 from flask import Blueprint, render_template, redirect, url_for, flash, session
-from .controllers import Controller
-from .services import Services
-from .models import Shipment, Trailer, Pallet
+from app.controllers import *
+from app.services import *
+from app.models import *
+from app.repositories import *
 
 main = Blueprint("main", __name__)
 
@@ -29,8 +30,8 @@ def create_shipment():
             )
 
         else:
-            shipment = Services.ConstructorMethods.create_shipment_object(form)
-            success = Services.DatabaseMethods.create_shipment(shipment)
+            shipment = StorageServices.create_shipment_object(form)
+            success = ShipmentRepository.create_shipment(shipment)
             if success:
                 flash(
                     f"Success, Shipment "
@@ -61,7 +62,7 @@ def edit_type(registration_number):
     if form.validate_on_submit():
         return redirect(
             url_for(
-                Controller.handle_choice(form.choice.data, alt=True),
+                handle_choice(form.choice.data, alt=True),
                 registration_number=registration_number,
             )
         )
@@ -76,7 +77,7 @@ def type_floor(registration_number):
     data = Controller.type_floor(registration_number)
 
     if data["form"].is_submitted():
-        Controller.remove_pallet_or_trailer(data["shipment"], registration_number)
+        # Controller.remove_pallet_or_trailer(data["shipment"], registration_number)
         return redirect(url_for("main.home"))
 
     return render_template(
@@ -89,8 +90,8 @@ def type_pallet(registration_number):
     data = Controller.type_pallet(registration_number)
 
     if data["form"].is_submitted():
-        Controller.remove_pallet_or_trailer(shipment=data["shipment"])
-        Controller.handle_move_to_pallet()  # to implement
+        # Controller.remove_pallet_or_trailer(shipment=data["shipment"])
+        # Controller.handle_move_to_pallet()  # to implement
         return redirect(url_for("main.home"))
 
     return render_template(
@@ -106,7 +107,7 @@ def type_trailer(registration_number):
 
     if data["form"].validate_on_submit():
         ## implement once you have a dropdown for trailer_id on form
-        Controller.handle_move_to_trailer(registration_number=registration_number)
+        # Controller.handle_move_to_trailer(registration_number=registration_number)
         return redirect(url_for("main.home"))
 
     return render_template(
@@ -122,7 +123,7 @@ def settings():
     if form.validate_on_submit():
         return redirect(
             url_for(
-                Controller.handle_choice(form.choice.data),
+                handle_choice(form.choice.data),
             )
         )
     return render_template("settings/settings.html", form=form)
@@ -132,7 +133,7 @@ def settings():
 def pallet():
     form = Controller.settings()["batch-form"]
     if form.validate_on_submit():
-        msg = Controller.add_element(form.choice.data, Pallet)
+        msg = StorageServices.add_element(form.choice.data, Pallet)
         if msg != "":
             message, category = msg
             flash(message, category)
@@ -145,7 +146,7 @@ def pallet():
 def trailer():
     form = Controller.settings()["batch-form"]
     if form.validate_on_submit():
-        msg = Controller.add_element(form.choice.data, Trailer)
+        msg = StorageServices.add_element(form.choice.data, Trailer)
         if msg != "":
             message, category = msg
             flash(message, category)
@@ -153,3 +154,17 @@ def trailer():
         return redirect(url_for("main.trailer"))
 
     return render_template("settings/trailer.html", form=form)
+
+
+@staticmethod
+def handle_choice(choice, alt=False):
+    if choice == "floor":
+        route = "main.type_floor"
+    elif choice == "pallet":
+        route = "main.type_pallet" if alt else "main.pallet"
+    elif choice == "trailer":
+        route = "main.type_trailer" if alt else "main.trailer"
+    else:
+        route = None
+
+    return route

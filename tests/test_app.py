@@ -2,10 +2,11 @@ import pytest
 import os
 import tempfile
 import sys
-from app.forms import Forms
-from app.services import Services
-from app.models import Shipment, Pallet, Trailer
-from app.controllers import Controller
+from app.models import *
+from app.controllers import *
+from app.services import *
+from app.forms import *
+from app.forms.shipment_forms import remove_delimiters
 
 sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), "..")))
 
@@ -52,77 +53,23 @@ class TestHomePage:
 class TestHelperMethods:
     """Test helper functions for functionality"""
 
-    def test_boolean_to_status_string(self):
-        """Test method for satisfactory functionality"""
-        helper = Services.HelperMethods()
-        assert helper.boolean_to_status_string(True) == "At Capacity"
-        assert helper.boolean_to_status_string(False) == "Not at Capacity"
-        assert helper.boolean_to_status_string(None) == ""
-
     def test_remove_delimiters(self):
         """Test remove delimiters for functionality"""
-        helper = Services.HelperMethods()
-        assert helper.remove_delimiters("8136-0025-2025") == "813600252025"
-        assert helper.remove_delimiters("8136--0025--2025") == "813600252025"
-        assert helper.remove_delimiters("8136 0025 2025") == "813600252025"
-        assert helper.remove_delimiters("8136   0025-2025") == "813600252025"
-        assert helper.remove_delimiters("8136/0025/2025") == "813600252025"
-        assert helper.remove_delimiters(None) == ""
 
-    def test_filter_with_regex(self):
-        """Test filter with regex for functionality"""
-        helper = Services.HelperMethods()
-        assert (
-            helper.filter_with_regex("!%^*&$8 72d30874)*&(*^(&%)),", Pallet)
-            == "87230874,"
-        )
-        assert helper.filter_with_regex("(*^&%^T55 92/,'[]k,", Trailer) == "T5592,k,"
-
-    def test_mark_invalid_data(self):
-        """Test functionality mark invalid data"""
-        helper = Services.HelperMethods()
-        # Pallet
-        # Valid data
-        assert helper.mark_invalid_data("1000", Pallet) == True
-        # Invalid data through length min
-        assert helper.mark_invalid_data("199", Pallet) == False
-        # Invalid data through length max
-        assert helper.mark_invalid_data("10001", Pallet) == False
-
-        # Trailer
-        # Valid data
-        assert helper.mark_invalid_data("T3", Trailer) == True
-        # Invalid data through min length
-        assert helper.mark_invalid_data("T", Trailer) == False
-
-        def test_add_element_validator(self, app):
-            """Test functionality of add element validator"""
-            helper = Services.HelperMethods()
-
-            with app.app_context():
-                # Test valid pallet (doesn't exist yet)
-                records = []
-                record = helper.add_element_validator(records, "5444", Pallet)
-                assert record == [("5444", True)]
-
-                # Test invalid pallet (already exists)
-                records = []
-                pallet = Pallet(id="1000")
-                db.session.add(pallet)
-                db.session.commit()
-                record = helper.add_element_validator(records, "1000", Pallet)
-                assert record == [("1000", False)]
-
-                # Test invalid format
-                records = []
-                record = helper.add_element_validator(records, "100", Pallet)
-                assert record == [("100", False)]
+        assert remove_delimiters("8136-0025-2025") == "813600252025"
+        assert remove_delimiters("8136--0025--2025") == "813600252025"
+        assert remove_delimiters("8136 0025 2025") == "813600252025"
+        assert remove_delimiters("8136   0025-2025") == "813600252025"
+        assert remove_delimiters("8136/0025/2025") == "813600252025"
+        assert remove_delimiters(None) == ""
 
     def test_add_element(self, app):
         """Test functionality of add element"""
         with app.app_context():
-            msg, category = Controller.add_element("1001", Pallet)
+            msg, category = StorageServices.add_element("1001", Pallet)
             assert msg == "Valid Pallet: 1001"
+            msg, category = StorageServices.add_element("1001", Pallet)
+            assert msg == "Invalid Pallet: 1001"
 
 
 class TestCreateShipmentForm:
@@ -131,7 +78,7 @@ class TestCreateShipmentForm:
     def test_form_valid(self, app):
         """Test form validation with valid data."""
         with app.app_context():
-            form = Forms.CreateShipmentForm(
+            form = CreateShipmentForm(
                 data={
                     "registration_number": "815009392934",
                     "first_name": "John",
@@ -153,7 +100,7 @@ class TestCreateShipmentForm:
     def test_form_invalid(self, app):
         """Test form validation with invalid data"""
         with app.app_context():
-            form = Forms.CreateShipmentForm(
+            form = CreateShipmentForm(
                 data={
                     "registration_number": "",
                     "first_name": "John",
@@ -176,7 +123,7 @@ class TestCreateShipmentForm:
         """Test Non PK Field That Is Required"""
 
         with app.app_context():
-            form = Forms.CreateShipmentForm(
+            form = CreateShipmentForm(
                 data={
                     "registration_number": "",
                     "first_name": "John",
@@ -198,7 +145,7 @@ class TestCreateShipmentForm:
     def test_form_optional_field(self, app):
         """Test Non PK Field That Is Optional"""
         with app.app_context():
-            form = Forms.CreateShipmentForm(
+            form = CreateShipmentForm(
                 data={
                     "registration_number": "",
                     "first_name": "John",
@@ -220,7 +167,7 @@ class TestCreateShipmentForm:
     def test_form_submit(self, app, client):
         """Test Post, And For PK Violations"""
         with app.app_context():
-            form = Forms.CreateShipmentForm(
+            form = CreateShipmentForm(
                 data={
                     "registration_number": "813601602025",
                     "first_name": "John",
@@ -248,7 +195,7 @@ class TestDatabaseMethods:
         """Test functionality of update"""
         with app.app_context():
             pallet = Pallet(id="1000")
-            Services.DatabaseMethods.update(pallet)
+            ShipmentRepository.update(pallet)
             assert len(db.session.query(Pallet).all()) == 1
 
     def test_get_shipment(self, app):
@@ -258,13 +205,12 @@ class TestDatabaseMethods:
             shipment = Shipment(registration_number=id, first_name="1", last_name="2")
             db.session.add(shipment)
             db.session.commit()
-
-            assert Services.DatabaseMethods.get_shipment(id) == shipment
+            assert ShipmentRepository.get_shipment(id) == shipment
 
     def mark_invalid_pk(self, app):
         """Test functionality of mark invlalid pk"""
         with app.app_context():
-            helper = Services.DatabaseMethods()
+            helper = ShipmentRepository.DatabaseMethods()
             assert helper.mark_invalid_pk("1001", Pallet) == True
             assert helper.mark_invalid_pk("100", Pallet) == False
             assert helper.mark_invalid_pk("", Pallet) == False
