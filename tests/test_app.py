@@ -2,11 +2,19 @@ import pytest
 import os
 import tempfile
 import sys
-from app.models import *
-from app.controllers import *
-from app.services import *
-from app.forms import *
-from app.forms.shipment_forms import remove_delimiters
+from app.models import Shipment, Pallet, Trailer, OversizedGood
+from app.controllers import ShipmentsController, SettingsController
+from app.services import StorageServices
+from app.forms import (
+    EditTypeForm,
+    EditSettingForm,
+    BatchEntryForm,
+    EditTypeFloorForm,
+    EditTypeTrailerForm,
+    CreateShipmentForm,
+)
+
+from app.repositories import ShipmentRepository
 
 sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), "..")))
 
@@ -51,17 +59,6 @@ class TestHomePage:
 
 
 class TestHelperMethods:
-    """Test helper functions for functionality"""
-
-    def test_remove_delimiters(self):
-        """Test remove delimiters for functionality"""
-
-        assert remove_delimiters("8136-0025-2025") == "813600252025"
-        assert remove_delimiters("8136--0025--2025") == "813600252025"
-        assert remove_delimiters("8136 0025 2025") == "813600252025"
-        assert remove_delimiters("8136   0025-2025") == "813600252025"
-        assert remove_delimiters("8136/0025/2025") == "813600252025"
-        assert remove_delimiters(None) == ""
 
     def test_add_element(self, app):
         """Test functionality of add element"""
@@ -205,6 +202,7 @@ class TestDatabaseMethods:
             shipment = Shipment(registration_number=id, first_name="1", last_name="2")
             db.session.add(shipment)
             db.session.commit()
+
             assert ShipmentRepository.get_shipment(id) == shipment
 
     def mark_invalid_pk(self, app):

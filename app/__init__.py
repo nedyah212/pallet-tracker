@@ -18,13 +18,14 @@ def create_app():
     db.init_app(app)
     bcrypt.init_app(app)
 
-    from . import models
+    from app.models import Shipment, Pallet, Trailer, OversizedGood
 
     with app.app_context():
         db.create_all()
 
-    from .routes import main
+    from app.blueprints import core_bp, settings_bp
 
-    app.register_blueprint(main)
+    app.register_blueprint(core_bp)
+    app.register_blueprint(settings_bp)
 
     return app
