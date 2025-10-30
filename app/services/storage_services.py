@@ -29,24 +29,21 @@ class StorageServices:
         )
         return oversized_good
 
+    @staticmethod
     def add_element(elements, elementT):
         records = []
         for element in elements.split(","):
             element = element.strip()
 
             # Filter by type and regex
-            if elementT == Pallet:
-                element = re.sub(r"[^0-9,]", "", element)
-            elif elementT == Trailer:
-                element = re.sub(r"[^a-zA-Z0-9,]", "", element)
-                element.capitalize()
+            element = re.sub(r"[^a-zA-Z0-9,]", "", element)
+            element = element.capitalize()
 
             # Filter by type and length
             is_valid = False
             if elementT == Pallet:
-                if len(element) == 4:
+                if len(element) == 4 and element.isdigit():
                     is_valid = True
-
             elif elementT == Trailer:
                 if len(element) >= 2:
                     is_valid = True
@@ -59,15 +56,14 @@ class StorageServices:
         valid = [el for el, is_valid in records if is_valid]
         invalid = [el for el, is_valid in records if not is_valid]
 
-        for element in valid:
-            obj = elementT(id=element)  # Create Pallet or Trailer object
-            ShipmentRepository.create_shipment(obj)
-
-        if invalid:
-            msg = f"Invalid {elementT.__name__}: {', '.join(invalid)}"
-            category = "error"
-        else:
+        if not invalid:
+            for element in valid:
+                obj = elementT(id=element)
+                ShipmentRepository.create_shipment(obj)
             msg = f"Valid {elementT.__name__}: {', '.join(valid)}"
             category = "success"
+        else:
+            msg = f"Invalid {elementT.__name__}: {', '.join(invalid)}"
+            category = "error"
 
         return msg, category
