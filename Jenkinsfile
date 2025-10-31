@@ -71,14 +71,14 @@ pipeline {
             steps {
                 withCredentials([
                     sshUserPrivateKey(
-                        credentialsId: 'staging-ssh-key',
-                        keyFileVariable: 'SSH_KEY',
-                        usernameVariable: 'SSH_USER'
+                        credentialsId: "staging-ssh-key",
+                        keyFileVariable: "SSH_KEY",
+                        usernameVariable: "SSH_USER"
                     ),
                     usernamePassword(
-                        credentialsId: 'nexus-credentials',
-                        usernameVariable: 'NEXUS_CREDS_USR',
-                        passwordVariable: 'NEXUS_CREDS_PSW'
+                        credentialsId: "nexus-credentials",
+                        usernameVariable: "NEXUS_CREDS_USR",
+                        passwordVariable: "NEXUS_CREDS_PSW"
                     )
                 ]) {
                     script {
@@ -115,14 +115,14 @@ pipeline {
             steps {
                 withCredentials([
                     sshUserPrivateKey(
-                        credentialsId: 'prod-ssh-key',
-                        keyFileVariable: 'SSH_KEY',
-                        usernameVariable: 'SSH_USER'
+                        credentialsId: "prod-ssh-key",
+                        keyFileVariable: "SSH_KEY",
+                        usernameVariable: "SSH_USER"
                     ),
                     usernamePassword(
-                        credentialsId: 'nexus-credentials',
-                        usernameVariable: 'NEXUS_CREDS_USR',
-                        passwordVariable: 'NEXUS_CREDS_PSW'
+                        credentialsId: "nexus-credentials",
+                        usernameVariable: "NEXUS_CREDS_USR",
+                        passwordVariable: "NEXUS_CREDS_PSW"
                     )
                 ]) {
                     script {
