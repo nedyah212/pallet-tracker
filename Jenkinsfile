@@ -72,7 +72,7 @@ pipeline {
             sh '''
                 curl -f http://10.0.0.225 || exit 1
 
-                echo "Staging server is active.
+                echo "Staging server is active."
                '''
             }
         }
@@ -127,7 +127,7 @@ pipeline {
             sh '''
                 curl -f http://10.0.0.225 || exit 1
 
-                echo "Staging production server is active.
+                echo "Staging production server is active."
                '''
             }
         }
