@@ -67,6 +67,16 @@ pipeline {
             }
         }
 
+        stage("Verify Staging Server Status") {
+        steps {
+            sh '''
+                curl -f http://10.0.0.225 || exit 1
+
+                echo "Staging server is active.
+               '''
+            }
+        }
+
         stage('Deploy to Staging Server') {
             steps {
                 withCredentials([
@@ -108,6 +118,17 @@ pipeline {
 
                     echo "Staging deployment verified!"
                 '''
+            }
+        }
+
+
+        stage("Verify Production Server Status") {
+        steps {
+            sh '''
+                curl -f http://10.0.0.225 || exit 1
+
+                echo "Staging production server is active.
+               '''
             }
         }
 
