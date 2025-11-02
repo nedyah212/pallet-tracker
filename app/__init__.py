@@ -13,7 +13,10 @@ def create_app():
     app = Flask(__name__)
     app.config["SECRET_KEY"] = os.getenv("SECRET_FLASK_KEY")
     app.config["SQLALCHEMY_DATABASE_URI"] = "sqlite:///site.db"
-    app.config["SQLALCHEMY_TRACK_MODIFICATIONS"] = False
+
+    # Turn off in production
+    app.config["SQLALCHEMY_TRACK_MODIFICATIONS"] = True
+    app.config["DEBUG"] = True
 
     db.init_app(app)
     bcrypt.init_app(app)

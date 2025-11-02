@@ -1,7 +1,9 @@
 <section>
   <div>
     <form method="POST">
-      {{ form.csrf_token() }}
+      {% if config.WTF_CSRF_ENABLED and form.csrf_token is defined %}
+        {{ form.csrf_token() }}
+      {% endif %}
       {{ form.choice }}
       <br>
       <br>

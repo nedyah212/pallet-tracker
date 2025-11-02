@@ -25,8 +25,6 @@ from app import create_app, db
 def app():
     """Create application instance for testing."""
     test_app = create_app()
-
-    db_fd, db_path = tempfile.mkstemp()
     test_app.config["SQLALCHEMY_DATABASE_URI"] = "sqlite:///:memory:"
     test_app.config["TESTING"] = True
     test_app.config["WTF_CSRF_ENABLED"] = False
@@ -35,11 +33,9 @@ def app():
     with test_app.app_context():
         db.create_all()
         yield test_app
+        db.session.rollback()
         db.session.remove()
         db.drop_all()
-
-    os.close(db_fd)
-    os.unlink(db_path)
 
 
 @pytest.fixture
@@ -48,12 +44,43 @@ def client(app):
     return app.test_client()
 
 
-class TestHomePage:
-    """Test the home page and basic functionality."""
+@pytest.fixture(autouse=True)
+def reset_db(app):
+    """Reset database between each test."""
+    yield
+    with app.app_context():
+        db.session.rollback()
+
+
+class TestSmoke:
 
     def test_home_page_loads(self, client):
         """Test that the home page loads successfully."""
         response = client.get("/")
+        assert response.status_code == 200
+        assert b"<!DOCTYPE html>" in response.data or b"<html" in response.data
+
+    def test_create_shipment(self, client):
+        """Test that create shipment page successfully loads"""
+        response = client.get("/create_shipment")
+        assert response.status_code == 200
+        assert b"<!DOCTYPE html>" in response.data or b"<html" in response.data
+
+    def test_settings(self, client):
+        """Test that settings page loads properly"""
+        response = client.get("/settings")
+        assert response.status_code == 200
+        assert b"<!DOCTYPE html>" in response.data or b"<html" in response.data
+
+    def test_settings_pallet(self, client):
+        """Test that settings pallet page loads properly"""
+        response = client.get("/settings/pallet")
+        assert response.status_code == 200
+        assert b"<!DOCTYPE html>" in response.data or b"<html" in response.data
+
+    def test_settings_trailer(self, client):
+        """Test that settings trailer page loads properly"""
+        response = client.get("/settings/trailer")
         assert response.status_code == 200
         assert b"<!DOCTYPE html>" in response.data or b"<html" in response.data
 
@@ -70,8 +97,6 @@ class TestHelperMethods:
 
 
 class TestCreateShipmentForm:
-    """Test create shipment form for functionality"""
-
     def test_form_valid(self, app):
         """Test form validation with valid data."""
         with app.app_context():
@@ -205,13 +230,17 @@ class TestDatabaseMethods:
 
             assert ShipmentRepository.get_shipment(id) == shipment
 
-    def mark_invalid_pk(self, app):
-        """Test functionality of mark invlalid pk"""
+    def test_mark_invalid_pk(self, app):
+        """Test functionality of mark invalid pk"""
         with app.app_context():
-            helper = ShipmentRepository.DatabaseMethods()
+            valid_pallet = Pallet(id="100")
+            valid_trailer = Trailer(id="T100")
+            db.session.add(valid_pallet)
+            db.session.add(valid_trailer)
+            db.session.commit()
+
+            helper = ShipmentRepository()
             assert helper.mark_invalid_pk("1001", Pallet) == True
+            assert helper.mark_invalid_pk("T200", Trailer) == True
             assert helper.mark_invalid_pk("100", Pallet) == False
-            assert helper.mark_invalid_pk("", Pallet) == False
-            assert helper.mark_invalid_pk("T100", Trailer) == True
-            assert helper.mark_invalid_pk("T", Trailer) == False
-            assert helper.mark_invalid_pk("", Pallet) == False
+            assert helper.mark_invalid_pk("T100", Trailer) == False

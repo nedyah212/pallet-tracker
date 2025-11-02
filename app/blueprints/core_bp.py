@@ -9,6 +9,12 @@ core_bp = Blueprint("core_bp", __name__)
 
 @core_bp.route("/")
 def home():
+
+    # if not shipment:
+    #     flash(f"Shipment: {registration_number} not found.", "error")
+    # else:
+    #     flash(f"Shipment found", "success")
+
     return render_template("home.html")
 
 
@@ -52,9 +58,12 @@ def show_shipment(registration_number):
     shipment = ShipmentRepository.get_shipment(registration_number)
 
     if not shipment:
-        flash(f"Shipment: {registration_number} not found.", "error")
+        flash(
+            f"There an error has occured, shipment {registration_number} not found",
+            "error",
+        )
     else:
-        flash(f"Shipment found", "success")
+        flash(f"Info: Change shipment information or type", "info")
 
     return render_template(
         "shipment/show.html", registration_number=registration_number, shipment=shipment
@@ -121,7 +130,7 @@ def type_pallet(registration_number):
 
 @core_bp.route("/edit_type/<registration_number>/trailer", methods=["GET", "POST"])
 def type_trailer(registration_number):
-    controller = ShipmentsController
+    controller = ShipmentsController()
     data = controller.type_trailer(registration_number)
 
     if data["form"].validate_on_submit():
