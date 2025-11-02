@@ -47,10 +47,17 @@ def create_shipment():
     return render_template("shipment/create.html", form=form)
 
 
-@core_bp.route("/show_shipment/<registration_number>")
+@core_bp.route("/show_shipment/<registration_number>", methods=["GET", "POST"])
 def show_shipment(registration_number):
+    shipment = ShipmentRepository.get_shipment(registration_number)
+
+    if not shipment:
+        flash(f"Shipment: {registration_number} not found.", "error")
+    else:
+        flash(f"Shipment found", "success")
+
     return render_template(
-        "shipment/show.html", registration_number=registration_number
+        "shipment/show.html", registration_number=registration_number, shipment=shipment
     )
 
 

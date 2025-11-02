@@ -1,0 +1,51 @@
+<section>
+  {% if shipment %}
+    <div>
+      <h2>Registration Number: {{ shipment.registration_number }}</h2>
+      <dl class="flex-container">
+        <div>
+          <dt><strong>Shipper Name:</strong></dt>
+          <dd>{{ shipment.shipper_name_reversed or "N/A"}}</dd>
+
+          <dt><strong>Tag Colour:</strong></dt>
+          <dd>{{ shipment.tag_colour or "N/A"}}</dd>
+
+          <dt><strong>Tag Code:</strong></dt>
+          <dd>{{ shipment.tag_code or "N/A"}}</dd>
+
+          <dt><strong>Date Received:</strong></dt>
+          <dd>{{ shipment.date_received or "N/A"}}</dd>
+
+          <dt><strong>Date Out:</strong></dt>
+          <dd>{{ shipment.date_out or "N/A"}}</dd>
+
+          <dt><strong>Origin:</strong></dt>
+          <dd>{{ shipment.origin or "N/A"}}</dd>
+        </div>
+        <div>
+          <dt><strong>Destination:</strong></dt>
+          <dd>{{ shipment.destination or "N/A"}}</dd>
+
+          <dt><strong>Driver In:</strong></dt>
+          <dd>{{ shipment.driver_in or "N/A"}}</dd>
+
+          <dt><strong>Driver Out:</strong></dt>
+          <dd>{{ shipment.driver_out or "N/A"}}</dd>
+
+          <dt><strong>Checked In By:</strong></dt>
+          <dd>{{ shipment.checked_in_by or "N/A"}}</dd>
+
+          <dt><strong>Checked Out By:</strong></dt>
+          <dd>{{ shipment.checked_out_by or "N/A"}}</dd>
+
+          <dt><strong>Archived:</strong></dt>
+          <dd>{{ shipment.archived or "N/A"}}</dd>
+        </div>
+      </dl>
+    </div>
+  {% else %}
+    <div>
+      <p>The shipment could not be found!</p>
+    </div>
+  {% endif %}
+</section>

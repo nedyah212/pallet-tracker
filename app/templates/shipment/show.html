@@ -3,8 +3,15 @@
       <meta charset="UTF-8">
       <meta name="viewport" content="width=device-width, initial-scale=1.0">
       <title>Shipment Details - Pallet Tracker</title>
+      <link rel="stylesheet" href="{{ url_for('static', filename='styles.css')}}">
   </head>
   <body>
     {% include '_partials/_nav.html' %}
+    {% include '_partials/_show_shipment.html' %}
+    {% if shipment %}
+      <a href="{{ url_for('core_bp.edit_type', registration_number=shipment.registration_number)}}">
+        Edit Shipment
+      </a>
+    {% endif %}
   </body>
 </html>
