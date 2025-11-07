@@ -1,4 +1,4 @@
-from app.forms import EditSettingForm, BatchEntryForm
+from app.forms import BatchEntryForm
 
 
 class SettingsController:
@@ -6,6 +6,5 @@ class SettingsController:
     @staticmethod
     def settings():
         return {
-            "settings-form": EditSettingForm(),
             "batch-form": BatchEntryForm(),
         }

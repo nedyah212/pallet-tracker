@@ -7,7 +7,6 @@ from app.controllers import ShipmentsController, SettingsController
 from app.services import StorageServices
 from app.forms import (
     EditTypeForm,
-    EditSettingForm,
     BatchEntryForm,
     EditTypeFloorForm,
     EditTypeTrailerForm,

@@ -18,16 +18,6 @@ class EditTypeForm(FlaskForm):
     submit = SubmitField("Submit")
 
 
-class EditSettingForm(FlaskForm):
-    choice = RadioField(
-        "Choose an Option",
-        choices=[("pallet", "Pallet"), ("trailer", "Trailer")],
-        validators=[DataRequired()],
-        default="pallet",
-    )
-    submit = SubmitField("Submit")
-
-
 class BatchEntryForm(FlaskForm):
     choice = TextAreaField(
         "Pallets",
