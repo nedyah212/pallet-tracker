@@ -37,6 +37,12 @@
                 {% if request.endpoint == 'settings_bp.trailer' %}text-blue-100{% endif %}">
         Trailer
       </a>
+      <a href="{{ url_for('settings_bp.tags') }}"
+         class="font-quicksand text-lg text-white
+                hover:text-blue-100 transition-colors duration-200
+                {% if request.endpoint == 'settings_bp.trailer' %}text-blue-100{% endif %}">
+        Tags
+      </a>
     {% endif %}
   </div>
 </nav>

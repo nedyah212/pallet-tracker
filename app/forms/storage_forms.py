@@ -4,8 +4,9 @@ from wtforms import (
     SubmitField,
     RadioField,
     SelectField,
+    StringField
 )
-from wtforms.validators import DataRequired
+from wtforms.validators import DataRequired, Length
 
 
 class EditTypeForm(FlaskForm):
@@ -38,3 +39,9 @@ class EditTypeFloorForm(FlaskForm):
 class EditTypeTrailerForm(FlaskForm):
     choice = SelectField("Select an option", validators=[DataRequired()])
     submit = SubmitField("Submit")
+
+class ColourForm(FlaskForm):
+    destination = StringField(
+        "Enter A Tag Colour",
+        validators=[DataRequired(), Length(max=30)],
+    )

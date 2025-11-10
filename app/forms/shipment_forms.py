@@ -4,9 +4,10 @@ from wtforms import (
     SubmitField,
     BooleanField,
     DateTimeField,
+    SelectField,
+    TextAreaField
 )
 from wtforms.validators import DataRequired, Length, Optional
-from datetime import datetime
 
 
 def remove_delimiters(text):
@@ -31,24 +32,13 @@ class CreateShipmentForm(FlaskForm):
         "Last Name",
         validators=[DataRequired(), Length(min=1, max=30)],
     )
-    tag_colour = StringField(
+    tag_colour = SelectField(
         "Tag Colour",
         validators=[DataRequired(), Length(min=3, max=15)],
     )
     tag_code = StringField(
         "Tag Code",
         validators=[DataRequired(), Length(min=6, max=30)],
-    )
-    date_received = DateTimeField(
-        "Date Received",
-        format="%Y-%m-%d %H:%M:%S",
-        validators=[DataRequired()],
-        default=datetime.now,
-    )
-    date_out = DateTimeField(
-        "Date Out",
-        format="%Y-%m-%d %H:%M:%S",
-        validators=[Optional()],
     )
     origin = StringField(
         "Origin",
@@ -58,23 +48,10 @@ class CreateShipmentForm(FlaskForm):
         "Destination",
         validators=[Optional(), Length(max=30)],
     )
-    driver_in = StringField(
-        "Driver In",
-        validators=[Optional(), Length(max=30)],
+    notes = TextAreaField(
+        "Notes",
+        validators=[Optional(), Length(max=250)],
     )
-    checked_in_by = StringField(
-        "Checked In By",
-        validators=[Optional(), Length(max=30)],
-    )
-    checked_out_by = StringField(
-        "Checked Out By",
-        validators=[Optional(), Length(max=30)],
-    )
-    driver_out = StringField(
-        "Driver Out",
-        validators=[Optional(), Length(max=30)],
-    )
-
     archived = BooleanField("Archived", default=False)
 
     submit = SubmitField("Save Shipment")

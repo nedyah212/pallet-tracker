@@ -1,6 +1,7 @@
 from ..models import Shipment, Pallet, Trailer, OversizedGood
 from app.repositories import *
 import re
+from datetime import datetime
 
 
 class StorageServices:
@@ -13,17 +14,15 @@ class StorageServices:
             last_name=form.last_name.data,
             tag_colour=form.tag_colour.data,
             tag_code=form.tag_code.data,
-            date_received=form.date_received.data,
+            date_received=datetime.now(),
             date_out=form.date_out.data,
             origin=form.origin.data,
             destination=form.destination.data,
-            driver_in=form.driver_in.data,
-            driver_out=form.driver_out.data,
-            checked_in_by=form.checked_in_by.data,
-            checked_out_by=form.checked_out_by.data,
+            notes=form.notes.data,
         )
         return shipment
-
+    
+    #SET DT Out @ TIME OF ARCHIVING!! 
     @staticmethod
     def create_oversized_good(form, desc, loc, reg):
         oversized_good = OversizedGood(

@@ -1,4 +1,4 @@
-from app.forms import BatchEntryForm
+from app.forms import BatchEntryForm, ColourForm
 
 
 class SettingsController:
@@ -7,4 +7,5 @@ class SettingsController:
     def settings():
         return {
             "batch-form": BatchEntryForm(),
+            "colour-form": ColourForm()
         }

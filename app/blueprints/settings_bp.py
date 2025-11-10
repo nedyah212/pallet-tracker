@@ -29,12 +29,19 @@ def pallet():
 def trailer():
     form = SettingsController.settings()["batch-form"]
     if form.validate_on_submit():
+        #Change logging msg
         logger.debug("The form was validated")
         msg = StorageServices.add_element(form.choice.data, Trailer)
         message, category = msg
-        print(message)
         flash(message, category)
 
         return redirect(url_for("settings_bp.trailer"))
     logger.debug("Check")
     return render_template("settings/trailer.html", form=form)
+
+@settings_bp.route("/settings/tags", methods=["GET", "POST"])
+def tags():
+    form = SettingsController.settings()["colour-form"]
+    if form.validate_on_submit():
+        pass
+    return render_template("settings/tags.html", form=form)

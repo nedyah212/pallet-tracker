@@ -3,6 +3,7 @@ from .storage_forms import (
     BatchEntryForm,
     EditTypeFloorForm,
     EditTypeTrailerForm,
+    ColourForm
 )
 
 from .shipment_forms import CreateShipmentForm
@@ -13,4 +14,5 @@ __all__ = [
     "EditTypeFloorForm",
     "EditTypeTrailerForm",
     "CreateShipmentForm",
+    "ColourForm"
 ]
